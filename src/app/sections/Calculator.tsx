@@ -4,9 +4,7 @@ import { PRAYERS, arDays, arPrayers, fmt, toKey } from "@/lib/prayers";
 import { useApp } from "../state";
 import { SectionHeader } from "../components/SectionHeader";
 import { Stepper } from "../components/Stepper";
-
-const inputCls =
-  "w-full px-4 py-3 bg-muted border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/25 transition-all";
+import { DatePicker } from "../components/DatePicker";
 
 export function Calculator() {
   const { state, derived, actions } = useApp();
@@ -39,13 +37,12 @@ export function Calculator() {
               <label htmlFor="start-date" className="block text-sm font-semibold text-foreground mb-2">
                 تاريخ البلوغ التقريبي
               </label>
-              <input
+              <DatePicker
                 id="start-date"
-                type="date"
-                max={todayKey}
                 value={state.startDate}
-                onChange={(e) => actions.setDates(e.target.value, state.endDate)}
-                className={inputCls}
+                max={state.endDate || todayKey}
+                onChange={(v) => actions.setDates(v, state.endDate)}
+                placeholder="اختر تاريخاً تقريبياً"
               />
               <p className="text-xs text-muted-foreground mt-1.5">تاريخ تقريبي مقبول تماماً</p>
             </div>
@@ -53,13 +50,12 @@ export function Calculator() {
               <label htmlFor="end-date" className="block text-sm font-semibold text-foreground mb-2">
                 تاريخ الالتزام بالصلاة
               </label>
-              <input
+              <DatePicker
                 id="end-date"
-                type="date"
-                max={todayKey}
                 value={state.endDate}
-                onChange={(e) => actions.setDates(state.startDate, e.target.value)}
-                className={inputCls}
+                min={state.startDate || undefined}
+                max={todayKey}
+                onChange={(v) => actions.setDates(state.startDate, v)}
               />
               {orderProblem && (
                 <p className="text-xs text-destructive mt-1.5">يجب أن يكون تاريخ الالتزام بعد تاريخ البلوغ.</p>
@@ -106,28 +102,28 @@ export function Calculator() {
                         </button>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
-                        <label className="text-xs text-muted-foreground space-y-1">
+                        <div className="text-xs text-muted-foreground space-y-1">
                           <span>من</span>
-                          <input
-                            type="date"
+                          <DatePicker
+                            size="sm"
+                            ariaLabel="بداية الفترة المستثناة"
                             value={p.from}
                             min={state.startDate || undefined}
-                            max={state.endDate || todayKey}
-                            onChange={(e) => actions.updateExcluded(p.id, { from: e.target.value })}
-                            className="w-full px-3 py-2 bg-card border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/25"
+                            max={p.to || state.endDate || todayKey}
+                            onChange={(v) => actions.updateExcluded(p.id, { from: v })}
                           />
-                        </label>
-                        <label className="text-xs text-muted-foreground space-y-1">
+                        </div>
+                        <div className="text-xs text-muted-foreground space-y-1">
                           <span>إلى</span>
-                          <input
-                            type="date"
+                          <DatePicker
+                            size="sm"
+                            ariaLabel="نهاية الفترة المستثناة"
                             value={p.to}
                             min={p.from || state.startDate || undefined}
                             max={state.endDate || todayKey}
-                            onChange={(e) => actions.updateExcluded(p.id, { to: e.target.value })}
-                            className="w-full px-3 py-2 bg-card border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/25"
+                            onChange={(v) => actions.updateExcluded(p.id, { to: v })}
                           />
-                        </label>
+                        </div>
                       </div>
                     </li>
                   ))}

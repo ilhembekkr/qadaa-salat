@@ -125,8 +125,4 @@
     line-height: 1.5;
   }
 
-  /* Native date pickers: keep the calendar icon on the reading-start side in RTL. */
-  input[type="date"] {
-    text-align: start;
-  }
 }
