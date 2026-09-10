@@ -16,22 +16,38 @@ export function daysBetween(from: string, to: string): number {
   return Math.max(0, dayDiff(fromKey(from).getTime(), fromKey(to).getTime()));
 }
 
+export interface MenstruationSettings {
+  enabled: boolean;
+  /** Average menstrual days per month, used to estimate days across the whole period. */
+  daysPerMonth: number;
+}
+
+export const MENSTRUATION_MAX_DAYS = 15;
+export const AVG_MONTH_DAYS = 30.44;
+
 export interface Estimate {
   /** Whole days between the two dates. */
   total: number;
-  /** Days removed by excluded periods (overlaps merged, clipped to the range). */
+  /** Days removed by dated periods (custom + postpartum; overlaps merged, clipped to the range). */
+  fixed: number;
+  /** Estimated menstrual days (applied to the days left after dated exclusions). */
+  menstrual: number;
+  /** fixed + menstrual */
   excluded: number;
   /** Days that count as missed. */
   net: number;
 }
 
+const EMPTY: Estimate = { total: 0, fixed: 0, menstrual: 0, excluded: 0, net: 0 };
+
 export function estimateMissedDays(
   start: string,
   end: string,
   excluded: readonly ExcludedPeriod[],
+  menstruation?: MenstruationSettings,
 ): Estimate {
   const total = daysBetween(start, end);
-  if (total === 0) return { total: 0, excluded: 0, net: 0 };
+  if (total === 0) return EMPTY;
 
   const s = fromKey(start).getTime();
   const e = fromKey(end).getTime();
@@ -59,7 +75,12 @@ export function estimateMissedDays(
   }
   if (curB > curA) excludedDays += dayDiff(curA, curB);
 
-  return { total, excluded: excludedDays, net: Math.max(0, total - excludedDays) };
+  const fixed = Math.min(total, excludedDays);
+  const afterFixed = total - fixed;
+  const perMonth = menstruation?.enabled ? Math.min(MENSTRUATION_MAX_DAYS, Math.max(0, menstruation.daysPerMonth)) : 0;
+  const menstrual = Math.min(afterFixed, Math.round((afterFixed / AVG_MONTH_DAYS) * perMonth));
+  const excludedTotal = fixed + menstrual;
+  return { total, fixed, menstrual, excluded: excludedTotal, net: Math.max(0, total - excludedTotal) };
 }
 
 export const newPeriodId = () =>

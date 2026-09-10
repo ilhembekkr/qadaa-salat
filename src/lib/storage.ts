@@ -1,4 +1,4 @@
-import type { ExcludedPeriod } from "./calc";
+import { MENSTRUATION_MAX_DAYS, type ExcludedPeriod, type MenstruationSettings } from "./calc";
 import { PRAYER_IDS, fillCounts, isDateKey, mapCounts, toKey, type PrayerCounts } from "./prayers";
 
 export type PrintPeriod = "week" | "month" | "quarter";
@@ -13,7 +13,11 @@ export interface AppState {
   version: 1;
   startDate: string;
   endDate: string;
+  /** Dated periods the user knows precisely. */
   excluded: ExcludedPeriod[];
+  /** Postpartum (نفاس) periods; counted only while menstruation.enabled. */
+  postpartum: ExcludedPeriod[];
+  menstruation: MenstruationSettings;
   calculated: boolean;
   /** Estimated missed prayers (the fixed baseline the user adjusts). */
   counts: PrayerCounts;
@@ -31,6 +35,8 @@ export const defaultState = (): AppState => ({
   startDate: "",
   endDate: "",
   excluded: [],
+  postpartum: [],
+  menstruation: { enabled: false, daysPerMonth: 6 },
   calculated: false,
   counts: fillCounts(0),
   targets: { fajr: 3, dhuhr: 1, asr: 2, maghrib: 1, isha: 2 },
@@ -56,14 +62,22 @@ export function sanitize(raw: unknown): AppState | null {
   if (!isRecord(raw) || raw.version !== 1) return null;
   const base = defaultState();
 
-  const excluded: ExcludedPeriod[] = Array.isArray(raw.excluded)
-    ? raw.excluded.filter(isRecord).map((p, i) => ({
-        id: typeof p.id === "string" && p.id ? p.id : `restored-${i}`,
-        label: typeof p.label === "string" ? p.label : "",
-        from: isDateKey(p.from) ? p.from : "",
-        to: isDateKey(p.to) ? p.to : "",
-      }))
-    : [];
+  const readPeriods = (v: unknown, prefix: string): ExcludedPeriod[] =>
+    Array.isArray(v)
+      ? v.filter(isRecord).map((p, i) => ({
+          id: typeof p.id === "string" && p.id ? p.id : `${prefix}-${i}`,
+          label: typeof p.label === "string" ? p.label : "",
+          from: isDateKey(p.from) ? p.from : "",
+          to: isDateKey(p.to) ? p.to : "",
+        }))
+      : [];
+  const excluded = readPeriods(raw.excluded, "restored");
+  const postpartum = readPeriods(raw.postpartum, "postpartum");
+  const m = isRecord(raw.menstruation) ? raw.menstruation : {};
+  const menstruation: MenstruationSettings = {
+    enabled: m.enabled === true,
+    daysPerMonth: Math.min(MENSTRUATION_MAX_DAYS, nonNegInt(m.daysPerMonth, base.menstruation.daysPerMonth)),
+  };
 
   const log: DailyLog = {};
   if (isRecord(raw.log)) {
@@ -85,6 +99,8 @@ export function sanitize(raw: unknown): AppState | null {
     startDate: isDateKey(raw.startDate) ? raw.startDate : "",
     endDate: isDateKey(raw.endDate) ? raw.endDate : "",
     excluded,
+    postpartum,
+    menstruation,
     calculated: raw.calculated === true,
     counts: readCounts(raw.counts, 0, base.counts),
     targets: mapCounts((id) => Math.min(MAX_TARGET, readCounts(raw.targets, 1, base.targets)[id])),

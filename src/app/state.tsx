@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { estimateMissedDays, newPeriodId, type ExcludedPeriod } from "@/lib/calc";
+import { MENSTRUATION_MAX_DAYS, estimateMissedDays, newPeriodId, type ExcludedPeriod, type MenstruationSettings } from "@/lib/calc";
 import {
   PRAYER_IDS,
   fillCounts,
@@ -34,11 +34,14 @@ export interface Derived {
   daysNeeded: number | null;
 }
 
+export type PeriodList = "excluded" | "postpartum";
+
 export interface Actions {
   setDates: (start: string, end: string) => void;
-  addExcluded: () => void;
-  updateExcluded: (id: string, patch: Partial<Omit<ExcludedPeriod, "id">>) => void;
-  removeExcluded: (id: string) => void;
+  addExcluded: (list?: PeriodList) => void;
+  updateExcluded: (id: string, patch: Partial<Omit<ExcludedPeriod, "id">>, list?: PeriodList) => void;
+  removeExcluded: (id: string, list?: PeriodList) => void;
+  setMenstruation: (patch: Partial<MenstruationSettings>) => void;
   calculate: () => void;
   setCount: (id: PrayerId, n: number) => void;
   adjustCount: (id: PrayerId, delta: number) => void;
@@ -68,6 +71,11 @@ function useTodayKey(): string {
     return () => clearInterval(t);
   }, [key]);
   return key;
+}
+
+/** Custom periods plus postpartum periods (the latter only while the الحيض والنفاس option is on). */
+export function allDatedExclusions(s: AppState): ExcludedPeriod[] {
+  return s.menstruation.enabled ? [...s.excluded, ...s.postpartum] : s.excluded;
 }
 
 export function daysNeededFor(remaining: PrayerCounts, targets: PrayerCounts): number {
@@ -123,21 +131,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const actions = useMemo<Actions>(
     () => ({
       setDates: (startDate, endDate) => setState((s) => ({ ...s, startDate, endDate })),
-      addExcluded: () =>
+      addExcluded: (list = "excluded") =>
         setState((s) => ({
           ...s,
-          excluded: [...s.excluded, { id: newPeriodId(), label: "", from: "", to: "" }],
+          [list]: [...s[list], { id: newPeriodId(), label: "", from: "", to: "" }],
         })),
-      updateExcluded: (id, patch) =>
+      updateExcluded: (id, patch, list = "excluded") =>
         setState((s) => ({
           ...s,
-          excluded: s.excluded.map((p) => (p.id === id ? { ...p, ...patch } : p)),
+          [list]: s[list].map((p) => (p.id === id ? { ...p, ...patch } : p)),
         })),
-      removeExcluded: (id) =>
-        setState((s) => ({ ...s, excluded: s.excluded.filter((p) => p.id !== id) })),
+      removeExcluded: (id, list = "excluded") =>
+        setState((s) => ({ ...s, [list]: s[list].filter((p) => p.id !== id) })),
+      setMenstruation: (patch) =>
+        setState((s) => {
+          const next = { ...s.menstruation, ...patch };
+          const days = Number.isFinite(next.daysPerMonth) ? Math.floor(next.daysPerMonth) : 0;
+          return { ...s, menstruation: { ...next, daysPerMonth: Math.min(MENSTRUATION_MAX_DAYS, Math.max(0, days)) } };
+        }),
       calculate: () =>
         setState((s) => {
-          const { net } = estimateMissedDays(s.startDate, s.endDate, s.excluded);
+          const { net } = estimateMissedDays(s.startDate, s.endDate, allDatedExclusions(s), s.menstruation);
           return { ...s, counts: fillCounts(net), calculated: true };
         }),
       setCount: (id, n) =>
