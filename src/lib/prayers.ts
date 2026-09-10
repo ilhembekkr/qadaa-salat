@@ -36,6 +36,7 @@ const numberFmt = new Intl.NumberFormat(LOCALE);
 const dayLongFmt = new Intl.DateTimeFormat(LOCALE, { weekday: "long", day: "numeric", month: "long" });
 const monthYearFmt = new Intl.DateTimeFormat(LOCALE, { month: "long", year: "numeric" });
 const shortDateFmt = new Intl.DateTimeFormat(LOCALE, { day: "numeric", month: "numeric" });
+const dayMonthShortFmt = new Intl.DateTimeFormat(LOCALE, { day: "numeric", month: "short" });
 const weekdayShortFmt = new Intl.DateTimeFormat(LOCALE, { weekday: "short" });
 
 export const fmt = (n: number): string => numberFmt.format(n);
@@ -44,6 +45,7 @@ export const pct = (n: number): string => `${fmt(n)}٪`;
 export const formatDayLong = (d: Date): string => dayLongFmt.format(d);
 export const formatMonthYear = (d: Date): string => monthYearFmt.format(d);
 export const formatShortDate = (d: Date): string => shortDateFmt.format(d);
+export const formatDayMonthShort = (d: Date): string => dayMonthShortFmt.format(d);
 export const formatWeekdayShort = (d: Date): string => weekdayShortFmt.format(d);
 
 interface ArForms {

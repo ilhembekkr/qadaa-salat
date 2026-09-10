@@ -4,7 +4,7 @@ export function FinalCta() {
   return (
     <section className="py-16 md:py-20 bg-primary">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary-foreground mb-5 leading-tight">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary-foreground mb-5 leading-snug">
           لديك خطة واضحة لما تستطيع فعله اليوم.
         </h2>
         <p className="text-lg md:text-xl text-primary-foreground/75 mb-8 md:mb-10 leading-relaxed">

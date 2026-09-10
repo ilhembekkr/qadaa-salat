@@ -1,5 +1,5 @@
 import { Printer } from "lucide-react";
-import { PRAYERS, addDays, arDays, formatShortDate, formatWeekdayShort } from "@/lib/prayers";
+import { PRAYERS, addDays, arDays, formatDayMonthShort, formatWeekdayShort } from "@/lib/prayers";
 import { PRINT_DAYS, PRINT_LABELS, type PrintPeriod } from "@/lib/storage";
 import { useApp } from "../state";
 import { Pill } from "../components/SectionHeader";
@@ -11,10 +11,10 @@ export function PrintablePlanner() {
   const today = new Date();
 
   return (
-    <section id="print" className="py-16 md:py-24 bg-secondary/40 scroll-mt-16">
+    <section id="print" className="py-10 md:py-24 bg-secondary/40 scroll-mt-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          <div className="order-2 lg:order-1">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+          <div className="order-2 lg:order-1 hidden lg:block">
             <div className="bg-card rounded-2xl shadow-2xl border border-border overflow-hidden max-w-sm mx-auto" aria-hidden="true">
               <div className="bg-primary px-6 py-3.5">
                 <div className="text-primary-foreground font-bold text-sm">خطة القضاء — {PRINT_LABELS[state.printPeriod]}</div>
@@ -37,7 +37,7 @@ export function PrintablePlanner() {
                       return (
                         <tr key={d} className="border-b border-border/40">
                           <td className="py-2 px-2 text-muted-foreground whitespace-nowrap">
-                            {formatWeekdayShort(date)} {formatShortDate(date)}
+                            {formatWeekdayShort(date)} {formatDayMonthShort(date)}
                           </td>
                           {PRAYERS.map((p) => (
                             <td key={p.id} className="py-2 px-1 text-center">
@@ -95,7 +95,7 @@ export function PrintablePlanner() {
               className="w-full flex items-center justify-center gap-3 py-4 bg-primary text-primary-foreground rounded-xl font-bold hover:bg-primary/90 transition-all shadow-md hover:shadow-lg"
             >
               <Printer className="w-5 h-5" aria-hidden="true" />
-              تحميل الخطة PDF
+              حفظ الخطة PDF
             </button>
             <p className="text-sm text-muted-foreground">
               تُفتح نافذة الطباعة؛ اختر «حفظ بصيغة PDF» أو اطبع مباشرة على ورق A4.

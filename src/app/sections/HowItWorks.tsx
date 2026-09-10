@@ -24,9 +24,9 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-16 md:py-24 bg-secondary/40 scroll-mt-16">
+    <section id="how-it-works" className="py-10 md:py-24 bg-secondary/40 scroll-mt-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionHeader eyebrow="كيف يعمل" title="خطة واضحة في ثلاث خطوات" className="mb-10 md:mb-16" />
+        <SectionHeader eyebrow="كيف يعمل" title="خطة واضحة في ثلاث خطوات" className="mb-6 md:mb-16" />
         <div className="grid md:grid-cols-3 gap-3 md:gap-8">
           {STEPS.map(({ num, title, body, Icon }) => (
             <div key={num} className="bg-card border border-border rounded-2xl p-4 md:p-8 hover:shadow-lg transition-all relative overflow-hidden flex md:block items-start gap-4">
@@ -38,7 +38,7 @@ export function HowItWorks() {
               </div>
               <div>
                 <h3 className="text-lg md:text-2xl font-bold text-foreground mb-1 md:mb-3">
-                  <span className="md:hidden text-primary/60 tabular-nums ml-1.5">{num}</span>
+                  <span className="md:hidden text-primary/60 tabular-nums me-1.5">{num}</span>
                   {title}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed md:leading-loose text-sm">{body}</p>

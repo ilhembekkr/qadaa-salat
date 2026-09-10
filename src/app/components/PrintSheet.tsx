@@ -1,4 +1,4 @@
-import { PRAYERS, addDays, arPrayers, formatDayLong, formatShortDate, formatWeekdayShort } from "@/lib/prayers";
+import { PRAYERS, addDays, arPrayers, formatDayLong, formatDayMonthShort, formatWeekdayShort } from "@/lib/prayers";
 import { PRINT_DAYS, PRINT_LABELS } from "@/lib/storage";
 import { useApp } from "../state";
 
@@ -40,7 +40,7 @@ export function PrintSheet() {
             return (
               <tr key={d}>
                 <td className="day-col">
-                  <span className="wd">{formatWeekdayShort(date)}</span> {formatShortDate(date)}
+                  <span className="wd">{formatWeekdayShort(date)}</span> {formatDayMonthShort(date)}
                 </td>
                 {PRAYERS.map((p) => {
                   const n = state.targets[p.id];

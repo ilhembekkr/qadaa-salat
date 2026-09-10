@@ -46,7 +46,7 @@ export function Privacy() {
   const btn = "flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2.5 px-2 sm:px-6 py-3 bg-card border border-border rounded-xl font-semibold text-xs sm:text-sm text-center hover:bg-secondary transition-all";
 
   return (
-    <section id="privacy" className="py-16 md:py-24 bg-background scroll-mt-16">
+    <section id="privacy" className="py-10 md:py-24 bg-background scroll-mt-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeader
           eyebrow="الخصوصية"
@@ -57,7 +57,7 @@ export function Privacy() {
             </>
           }
           subtitle="لا تحتاج إلى إنشاء حساب أو إدخال بريد إلكتروني. يتم حفظ خطتك وتقدمك محلياً على جهازك فقط."
-          className="mb-10 md:mb-16"
+          className="mb-6 md:mb-16"
         />
 
         <div className="grid grid-cols-3 gap-3 md:gap-8 mb-8 md:mb-12">
@@ -75,7 +75,7 @@ export function Privacy() {
         <div className="grid grid-cols-3 sm:flex sm:flex-wrap justify-center gap-3 sm:gap-4">
           <button type="button" onClick={() => downloadBackup(state)} className={btn}>
             <FileDown className="w-5 h-5 sm:w-4 sm:h-4 text-primary" aria-hidden="true" />
-            نسخ احتياطي لخطتي
+            <span className="sm:hidden">نسخ احتياطي</span><span className="hidden sm:inline">نسخ احتياطي لخطتي</span>
           </button>
           <button type="button" onClick={() => fileRef.current?.click()} className={btn}>
             <RotateCcw className="w-5 h-5 sm:w-4 sm:h-4 text-primary" aria-hidden="true" />
@@ -87,7 +87,7 @@ export function Privacy() {
             className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2.5 px-2 sm:px-6 py-3 bg-card border border-destructive/30 text-destructive rounded-xl font-semibold text-xs sm:text-sm text-center hover:bg-destructive/5 transition-all"
           >
             <Trash2 className="w-5 h-5 sm:w-4 sm:h-4" aria-hidden="true" />
-            حذف بياناتي
+            <span className="sm:hidden">حذف البيانات</span><span className="hidden sm:inline">حذف بياناتي</span>
           </button>
         </div>
         <input
@@ -105,7 +105,7 @@ export function Privacy() {
         >
           {status?.text ?? ""}
         </p>
-        <p className="text-center text-xs text-muted-foreground mt-2 max-w-md mx-auto leading-relaxed">
+        <p className="text-center text-[13px] text-muted-foreground mt-2 max-w-md mx-auto leading-relaxed">
           النسخة الاحتياطية ملف JSON صغير يُحفظ على جهازك. استخدمه للانتقال إلى جهاز آخر أو لحماية خطتك من حذف بيانات المتصفح.
         </p>
       </div>

@@ -23,9 +23,11 @@ interface Props {
   placeholder?: string;
   size?: "md" | "sm";
   ariaLabel?: string;
+  /** Month to open on when nothing is selected (YYYY-MM-DD). */
+  initialView?: string;
 }
 
-export function DatePicker({ id, value, onChange, min, max, placeholder = "اختر تاريخاً", size = "md", ariaLabel }: Props) {
+export function DatePicker({ id, value, onChange, min, max, placeholder = "اختر تاريخاً", size = "md", ariaLabel, initialView }: Props) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const gridId = useId();
@@ -35,12 +37,13 @@ export function DatePicker({ id, value, onChange, min, max, placeholder = "اخ�
   const minKey = min && isDateKey(min) ? min : undefined;
   const selected = isDateKey(value) ? value : "";
 
-  const initial = fromKey(selected || maxKey || today);
+  const viewKey = initialView && isDateKey(initialView) ? initialView : undefined;
+  const initial = fromKey(selected || viewKey || maxKey || today);
   const [viewYear, setViewYear] = useState(initial.getFullYear());
   const [viewMonth, setViewMonth] = useState(initial.getMonth());
 
   const openPicker = () => {
-    const d = fromKey(selected || maxKey || today);
+    const d = fromKey(selected || viewKey || maxKey || today);
     setViewYear(d.getFullYear());
     setViewMonth(d.getMonth());
     setOpen(true);
@@ -150,14 +153,14 @@ export function DatePicker({ id, value, onChange, min, max, placeholder = "اخ�
           role="dialog"
           aria-modal="true"
           aria-label="اختيار التاريخ"
-          className="w-full max-w-sm sm:w-[19.5rem] bg-card border border-border rounded-2xl shadow-2xl p-4 space-y-3"
+          className="w-full max-w-sm sm:w-[20.5rem] bg-card border border-border rounded-2xl shadow-2xl p-4 space-y-3"
         >
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => shiftMonth(-1)}
               aria-label="الشهر السابق"
-              className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted transition-colors"
+              className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-muted active:scale-95 transition-all"
             >
               <ChevronRight className="w-4 h-4" aria-hidden="true" />
             </button>
@@ -165,7 +168,7 @@ export function DatePicker({ id, value, onChange, min, max, placeholder = "اخ�
               aria-label="الشهر"
               value={viewMonth}
               onChange={(e) => setViewMonth(Number(e.target.value))}
-              className="flex-1 min-w-0 px-2 py-1.5 text-sm font-semibold bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/25"
+              className="flex-1 min-w-0 px-2 py-1.5 text-base sm:text-sm font-semibold bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/25"
             >
               {MONTHS.map((m, i) => (
                 <option key={m} value={i}>
@@ -177,7 +180,7 @@ export function DatePicker({ id, value, onChange, min, max, placeholder = "اخ�
               aria-label="السنة"
               value={viewYear}
               onChange={(e) => setViewYear(Number(e.target.value))}
-              className="w-24 px-2 py-1.5 text-sm font-semibold bg-muted border border-border rounded-lg tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/25"
+              className="w-24 px-2 py-1.5 text-base sm:text-sm font-semibold bg-muted border border-border rounded-lg tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/25"
             >
               {years.map((y) => (
                 <option key={y} value={y}>
@@ -189,7 +192,7 @@ export function DatePicker({ id, value, onChange, min, max, placeholder = "اخ�
               type="button"
               onClick={() => shiftMonth(1)}
               aria-label="الشهر التالي"
-              className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted transition-colors"
+              className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-muted active:scale-95 transition-all"
             >
               <ChevronLeft className="w-4 h-4" aria-hidden="true" />
             </button>
@@ -214,7 +217,7 @@ export function DatePicker({ id, value, onChange, min, max, placeholder = "اخ�
                   aria-label={fullFmt.format(fromKey(key))}
                   disabled={isDisabled(key)}
                   onClick={() => pick(key)}
-                  className={`h-10 sm:h-9 rounded-lg text-sm tabular-nums transition-colors disabled:opacity-25 disabled:cursor-not-allowed ${
+                  className={`h-11 sm:h-9 rounded-lg text-sm tabular-nums transition-colors active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed ${
                     key === selected
                       ? "bg-primary text-primary-foreground font-bold"
                       : key === today
@@ -237,7 +240,7 @@ export function DatePicker({ id, value, onChange, min, max, placeholder = "اخ�
                 if (!isDisabled(today)) pick(today);
               }}
               disabled={isDisabled(today)}
-              className="text-xs font-semibold text-primary hover:text-primary/75 disabled:opacity-40 py-2"
+              className="text-sm font-semibold text-primary hover:text-primary/75 disabled:opacity-40 py-2 px-1"
             >
               اليوم
             </button>
@@ -247,7 +250,7 @@ export function DatePicker({ id, value, onChange, min, max, placeholder = "اخ�
                 onChange("");
                 setOpen(false);
               }}
-              className="text-xs font-semibold text-muted-foreground hover:text-foreground py-2"
+              className="text-sm font-semibold text-muted-foreground hover:text-foreground py-2 px-1"
             >
               مسح
             </button>

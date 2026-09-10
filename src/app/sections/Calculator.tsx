@@ -1,31 +1,72 @@
 import { ArrowLeft, ChevronDown, Info, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { MENSTRUATION_MAX_DAYS, estimateMissedDays, type ExcludedPeriod } from "@/lib/calc";
-import { PRAYERS, arDays, arPrayers, fmt, toKey } from "@/lib/prayers";
+import { PRAYERS, addDays, arDays, arPrayers, fmt, toKey } from "@/lib/prayers";
 import { allDatedExclusions, useApp, type PeriodList } from "../state";
 import { SectionHeader } from "../components/SectionHeader";
 import { Stepper } from "../components/Stepper";
 import { DatePicker } from "../components/DatePicker";
 
-export function Calculator() {
+const THIS_YEAR = new Date().getFullYear();
+const DEFAULT_AGE = 14;
+
+interface Props {
+  /** App mode: the whole form sits behind a single disclosure row. */
+  collapsed?: boolean;
+}
+
+export function Calculator({ collapsed = false }: Props) {
   const { state, derived, actions } = useApp();
   const todayKey = toKey(new Date());
+  const [open, setOpen] = useState(!collapsed);
+
+  // Coarse entry for the first date: birth year + approximate age at puberty.
+  const [entryMode, setEntryMode] = useState<"age" | "date">(state.startDate ? "date" : "age");
+  const [birthYear, setBirthYear] = useState<number | "">("");
+  const [ageAtPuberty, setAgeAtPuberty] = useState<number>(DEFAULT_AGE);
+  const applyAge = (year: number | "", age: number) => {
+    setBirthYear(year);
+    setAgeAtPuberty(age);
+    if (typeof year === "number" && year >= 1900 && year <= THIS_YEAR && age >= 8 && age <= 25) {
+      actions.setDates(`${year + age}-01-01`, state.endDate);
+    }
+  };
+  const startPickerView = toKey(addDays(new Date(), -15 * 365));
   const estimate = estimateMissedDays(state.startDate, state.endDate, allDatedExclusions(state), state.menstruation);
   const cycle = state.menstruation;
   const canCalculate = Boolean(state.startDate && state.endDate) && estimate.total > 0;
   const orderProblem = state.startDate && state.endDate && estimate.total === 0;
 
   return (
-    <section id="calculator" className="py-16 md:py-24 bg-background scroll-mt-16">
+    <section id="calculator" className="py-10 md:py-24 bg-background scroll-mt-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionHeader
-          eyebrow="الحساب التقديري"
-          tone="accent"
-          title="ابدأ بتقدير صلواتك الفائتة"
-          subtitle="التواريخ تقريبية ولا بأس بذلك — يمكنك تعديل كل عدد يدوياً بعد الحساب."
-          className="mb-10 md:mb-16"
-        />
+        {collapsed ? (
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-controls="calculator-body"
+            className="w-full bg-card border border-border rounded-2xl px-4 md:px-6 py-4 flex items-center justify-between gap-4 text-start hover:border-primary/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+          >
+            <span>
+              <span className="block font-bold text-foreground">إعادة تقدير الصلوات الفائتة</span>
+              <span className="block text-[13px] text-muted-foreground mt-0.5 tabular-nums">
+                التقدير الحالي: {arPrayers(derived.totalMissed)} · قابل للتعديل
+              </span>
+            </span>
+            <ChevronDown className={`w-5 h-5 text-muted-foreground flex-shrink-0 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true" />
+          </button>
+        ) : (
+          <SectionHeader
+            eyebrow="الحساب التقديري"
+            tone="accent"
+            title="ابدأ بتقدير صلواتك الفائتة"
+            subtitle="التواريخ تقريبية ولا بأس بذلك — يمكنك تعديل كل عدد يدوياً بعد الحساب."
+            className="mb-6 md:mb-16"
+          />
+        )}
 
-        <div className="grid lg:grid-cols-2 gap-10 items-start">
+        <div id="calculator-body" hidden={!open} className={`grid lg:grid-cols-2 gap-6 lg:gap-10 items-start ${collapsed ? "mt-4" : ""}`}>
           {/* Inputs */}
           <form
             className="bg-card border border-border rounded-2xl p-5 md:p-8 space-y-6"
@@ -35,17 +76,64 @@ export function Calculator() {
             }}
           >
             <div>
-              <label htmlFor="start-date" className="block text-sm font-semibold text-foreground mb-2">
-                تاريخ البلوغ التقريبي
-              </label>
-              <DatePicker
-                id="start-date"
-                value={state.startDate}
-                max={state.endDate || todayKey}
-                onChange={(v) => actions.setDates(v, state.endDate)}
-                placeholder="اختر تاريخاً تقريبياً"
-              />
-              <p className="text-xs text-muted-foreground mt-1.5">تاريخ تقريبي مقبول تماماً</p>
+              <div className="flex items-center justify-between mb-2">
+                <label htmlFor={entryMode === "age" ? "birth-year" : "start-date"} className="block text-sm font-semibold text-foreground">
+                  تاريخ البلوغ التقريبي
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setEntryMode((m) => (m === "age" ? "date" : "age"))}
+                  className="text-[13px] font-semibold text-primary hover:text-primary/75 transition-colors"
+                >
+                  {entryMode === "age" ? "أو اختر تاريخاً محدداً" : "أو أدخل سنة الميلاد"}
+                </button>
+              </div>
+              {entryMode === "age" ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="text-[13px] text-muted-foreground space-y-1">
+                    <span>سنة الميلاد</span>
+                    <input
+                      id="birth-year"
+                      type="number"
+                      inputMode="numeric"
+                      min={1900}
+                      max={THIS_YEAR}
+                      placeholder={String(THIS_YEAR - 30)}
+                      value={birthYear}
+                      onChange={(e) => applyAge(Number.isFinite(e.target.valueAsNumber) ? e.target.valueAsNumber : "", ageAtPuberty)}
+                      className="w-full px-3 py-3 bg-muted border border-border rounded-xl text-base text-foreground tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/25"
+                    />
+                  </label>
+                  <label className="text-[13px] text-muted-foreground space-y-1">
+                    <span>سن البلوغ التقريبي</span>
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      min={8}
+                      max={25}
+                      value={ageAtPuberty}
+                      onChange={(e) => applyAge(birthYear, Number.isFinite(e.target.valueAsNumber) ? e.target.valueAsNumber : DEFAULT_AGE)}
+                      className="w-full px-3 py-3 bg-muted border border-border rounded-xl text-base text-foreground tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/25"
+                    />
+                  </label>
+                </div>
+              ) : (
+                <DatePicker
+                  id="start-date"
+                  value={state.startDate}
+                  max={state.endDate || todayKey}
+                  initialView={startPickerView}
+                  onChange={(v) => actions.setDates(v, state.endDate)}
+                  placeholder="اختر تاريخاً تقريبياً"
+                />
+              )}
+              <p className="text-[13px] text-muted-foreground mt-1.5">
+                {entryMode === "age"
+                  ? state.startDate
+                    ? `سيُحسب من بداية سنة ${state.startDate.slice(0, 4)} — غالباً بين 12 و15 سنة، ويكفي تقدير تقريبي.`
+                    : "غالباً بين 12 و15 سنة، ويكفي تقدير تقريبي."
+                  : "تاريخ تقريبي مقبول تماماً"}
+              </p>
             </div>
             <div>
               <label htmlFor="end-date" className="block text-sm font-semibold text-foreground mb-2">
@@ -59,7 +147,7 @@ export function Calculator() {
                 onChange={(v) => actions.setDates(state.startDate, v)}
               />
               {orderProblem && (
-                <p className="text-xs text-destructive mt-1.5">يجب أن يكون تاريخ الالتزام بعد تاريخ البلوغ.</p>
+                <p className="text-[13px] text-destructive mt-1.5">يجب أن يكون تاريخ الالتزام بعد تاريخ البلوغ.</p>
               )}
             </div>
 
@@ -67,7 +155,7 @@ export function Calculator() {
             <div className="space-y-4">
               <div>
                 <span className="block text-sm font-semibold text-foreground">فترات مستثناة (اختياري)</span>
-                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                <p className="text-[13px] text-muted-foreground mt-1 leading-relaxed">
                   أضف الفترات التي لا تريد احتسابها ضمن تقدير الصلوات الفائتة.
                 </p>
               </div>
@@ -122,7 +210,7 @@ export function Calculator() {
                   </span>
                   <span className="flex-1 min-w-0">
                     <span className="block text-sm font-semibold text-foreground">الحيض والنفاس</span>
-                    <span className="block text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                    <span className="block text-[13px] text-muted-foreground mt-0.5 leading-relaxed">
                       يمكن استبعاد هذه الأيام من مدة الحساب للحصول على تقدير أدق.
                     </span>
                   </span>
@@ -154,7 +242,7 @@ export function Calculator() {
                       />
                       <span className="text-sm text-muted-foreground">أيام</span>
                     </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
+                    <p className="text-[13px] text-muted-foreground leading-relaxed">
                       يمكن إدخال عدد تقريبي إذا لم تكن المدة معروفة بدقة.
                     </p>
                   </div>
@@ -182,7 +270,7 @@ export function Calculator() {
                   </div>
 
                   {estimate.total > 0 && (
-                    <p className="text-xs text-primary font-semibold tabular-nums">
+                    <p className="text-[13px] text-primary font-semibold tabular-nums">
                       الأيام المستبعدة تقديرياً: {arDays(estimate.excluded)}
                       {estimate.menstrual > 0 && <span className="text-muted-foreground font-normal"> — منها {arDays(estimate.menstrual)} للحيض</span>}
                     </p>
@@ -201,12 +289,12 @@ export function Calculator() {
             <button
               type="submit"
               disabled={!canCalculate}
-              className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+              className="w-full h-13 md:h-14 bg-primary text-primary-foreground rounded-xl font-bold text-base hover:bg-primary/90 active:scale-[0.99] transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
             >
               {state.calculated ? "إعادة الحساب" : "احسب الصلوات الفائتة"}
             </button>
             {state.calculated && (
-              <p className="text-xs text-muted-foreground text-center">
+              <p className="text-[13px] text-muted-foreground text-center">
                 إعادة الحساب تستبدل الأعداد الحالية، ولا تؤثر على ما سجّلته من صلوات القضاء.
               </p>
             )}
@@ -252,9 +340,9 @@ export function Calculator() {
               <div className="border-t border-border">
                 <div className="px-5 md:px-8 py-5 bg-primary/5 flex items-center justify-between">
                   <span className="text-sm font-semibold text-muted-foreground">الإجمالي</span>
-                  <span className="text-2xl font-bold text-primary tabular-nums">{arPrayers(derived.totalMissed)}</span>
+                  <span className="text-base md:text-lg font-semibold text-foreground tabular-nums">{arPrayers(derived.totalMissed)}</span>
                 </div>
-                <div className="px-5 md:px-8 py-4 text-xs text-muted-foreground leading-relaxed flex flex-col gap-1.5">
+                <div className="px-5 md:px-8 py-4 text-[13px] text-muted-foreground leading-relaxed flex flex-col gap-1.5">
                   <span>
                     الفترة: {arDays(estimate.total)}
                     {estimate.excluded > 0 && <> — مستثنى منها {arDays(estimate.excluded)}</>}

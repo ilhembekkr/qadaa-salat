@@ -1,5 +1,10 @@
 # Mobile UX/UI review — خطة القضاء (390 px, Arabic RTL)
 
+> **Status (10 Sep 2026, branch `mobile-first`):** all ten recommendations, the quick wins, and the bigger ideas
+> (app/landing mode, sticky today strip, week glance, quieter debt numbers, collapsed calculator) are implemented.
+> Not done: the 3-step calculator sheet (the collapsed disclosure covers the same need with less code).
+
+
 Reviewed: production build of `src/` rendered at 390 px (headless Chrome, iframe), plus source reading for the post-calculation ("live") state and the interactive components. Screenshots referenced below live in the session scratchpad (`review-full.png`, `p0.png`–`p3.png`, `slice-*.png`); "y≈" values are pixel offsets from the top of the 390 px page.
 
 ## Summary

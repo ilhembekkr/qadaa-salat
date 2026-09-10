@@ -96,7 +96,26 @@
 
   html {
     font-size: var(--font-size);
-    scroll-behavior: smooth;
+    /* Room for the phone bottom bar when jumping to anchors. */
+    scroll-padding-bottom: 5rem;
+  }
+
+  @media (min-width: 64rem) {
+    html {
+      scroll-padding-bottom: 0;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      html {
+        scroll-behavior: smooth;
+      }
+    }
+  }
+
+  /* iOS Safari zooms into focused fields smaller than 16px. */
+  @media (max-width: 40rem) {
+    input, select, textarea {
+      font-size: 16px;
+    }
   }
 
   body {
