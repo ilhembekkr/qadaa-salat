@@ -85,3 +85,11 @@ test('storage problems are surfaced with a backup action instead of failing sile
   assert.match(text(html), /لا يمكن الحفظ على هذا الجهاز/);
   assert.match(text(html), /نسخة احتياطية الآن/);
 });
+
+test('first-run hint shows on the live tracker only before anything is logged', () => {
+  const fresh = plan();
+  assert.match(text(render('components/TrackerCard', 'TrackerCard', fresh, { variant: 'live' })), /اضغط مربعاً لكل صلاة قضاء/);
+  const logged = plan({ log: { [today]: { fajr: 1 } } });
+  assert.doesNotMatch(text(render('components/TrackerCard', 'TrackerCard', logged, { variant: 'live' })), /اضغط مربعاً/);
+  assert.doesNotMatch(text(render('components/TrackerCard', 'TrackerCard', fresh, { variant: 'sample' })), /اضغط مربعاً/);
+});

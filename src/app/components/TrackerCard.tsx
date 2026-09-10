@@ -1,3 +1,5 @@
+import { X } from "lucide-react";
+import { useState } from "react";
 import { PRAYERS, formatDayLong, pct, type PrayerId } from "@/lib/prayers";
 import { useApp } from "../state";
 import { CheckBoxes, StaticCheckBoxes } from "./CheckBoxes";
@@ -10,6 +12,23 @@ const SAMPLE: Record<PrayerId, boolean[]> = {
   isha: [true, false],
 };
 
+const HINT_KEY = "qada-planner:hint-tracker";
+
+const readHintSeen = () => {
+  try {
+    return localStorage.getItem(HINT_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+const markHintSeen = () => {
+  try {
+    localStorage.setItem(HINT_KEY, "1");
+  } catch {
+    /* storage unavailable: the hint simply shows again next time */
+  }
+};
+
 interface Props {
   /** "live" is the single write surface for today's log; "sample" is a read-only preview. */
   variant: "live" | "sample";
@@ -20,6 +39,13 @@ interface Props {
 export function TrackerCard({ variant, id, className = "" }: Props) {
   const { state, derived, actions } = useApp();
   const live = variant === "live";
+  const [hintSeen, setHintSeen] = useState(readHintSeen);
+  const dismissHint = () => {
+    markHintSeen();
+    setHintSeen(true);
+  };
+  // One-time onboarding: only on the real tracker, only until the first prayer is logged or dismissed.
+  const showHint = live && state.calculated && !hintSeen && derived.totalDone === 0;
 
   const todayDone = live ? derived.todayCredited : 5;
   const todayTotal = live ? derived.todayRequired : 9;
@@ -33,6 +59,22 @@ export function TrackerCard({ variant, id, className = "" }: Props) {
         <span className="text-primary-foreground font-semibold">قضاء اليوم</span>
         <span className="text-primary-foreground/70 text-sm">{formatDayLong(new Date())}</span>
       </div>
+
+      {showHint && (
+        <div className="px-5 md:px-6 py-3 bg-secondary/70 border-b border-border flex items-start gap-3 text-[13px] leading-relaxed">
+          <p className="flex-1 text-foreground">
+            اضغط مربعاً لكل صلاة قضاء أديتها اليوم. اضغطه مرة أخرى للتراجع. المربع المنقّط يسجّل صلاة إضافية خارج هدف اليوم.
+          </p>
+          <button
+            type="button"
+            onClick={dismissHint}
+            aria-label="إغلاق التلميح"
+            className="w-8 h-8 -m-1.5 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-border/60 flex-shrink-0"
+          >
+            <X className="w-4 h-4" aria-hidden="true" />
+          </button>
+        </div>
+      )}
 
       <div className="divide-y divide-border">
         {PRAYERS.map((p) => {
@@ -49,7 +91,15 @@ export function TrackerCard({ variant, id, className = "" }: Props) {
                 )}
               </span>
               {live ? (
-                <CheckBoxes prayerName={p.name} target={derived.todayRequiredByPrayer[p.id]} done={done} onToggle={(i) => actions.toggleToday(p.id, i)} />
+                <CheckBoxes
+                  prayerName={p.name}
+                  target={derived.todayRequiredByPrayer[p.id]}
+                  done={done}
+                  onChange={(n) => {
+                    if (!hintSeen) dismissHint();
+                    actions.setTodayCount(p.id, n);
+                  }}
+                />
               ) : (
                 <StaticCheckBoxes boxes={SAMPLE[p.id]} />
               )}

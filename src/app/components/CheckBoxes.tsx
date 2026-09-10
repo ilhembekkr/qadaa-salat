@@ -1,4 +1,5 @@
 import { Minus, Plus } from "lucide-react";
+import { nextCountOnTap } from "@/lib/progress";
 
 const Check = () => (
   <svg width="12" height="10" viewBox="0 0 12 10" aria-hidden="true">
@@ -38,10 +39,10 @@ interface InteractiveProps {
   /** Prayers logged today (may exceed target). */
   done: number;
   /**
-   * Toggle semantics: `index < done` sets done = index (uncheck from there),
-   * otherwise sets done = index + 1. Passing `done` therefore adds one.
+   * Receives the NEW count for today. Boxes are a count: tapping a checked box
+   * removes one prayer, tapping an unchecked box (or the dashed box) adds one.
    */
-  onToggle: (index: number) => void;
+  onChange: (count: number) => void;
 }
 
 /**
@@ -49,7 +50,7 @@ interface InteractiveProps {
  * carry a sand border ("beyond target"), and a dashed ghost box adds one more
  * once the target is met. Large targets switch to a counter.
  */
-export function CheckBoxes({ prayerName, target, done, onToggle }: InteractiveProps) {
+export function CheckBoxes({ prayerName, target, done, onChange }: InteractiveProps) {
   const total = Math.max(target, done);
 
   if (total > MAX_BOXES) {
@@ -59,7 +60,7 @@ export function CheckBoxes({ prayerName, target, done, onToggle }: InteractivePr
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => onToggle(done - 1)}
+            onClick={() => onChange(Math.max(0, done - 1))}
             disabled={done === 0}
             aria-label={`إنقاص ${prayerName}`}
             className="w-11 h-11 md:w-10 md:h-10 rounded-xl border-2 border-border flex items-center justify-center hover:border-primary hover:text-primary active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
@@ -71,7 +72,7 @@ export function CheckBoxes({ prayerName, target, done, onToggle }: InteractivePr
           </span>
           <button
             type="button"
-            onClick={() => onToggle(done)}
+            onClick={() => onChange(done + 1)}
             aria-label={`زيادة ${prayerName}`}
             className="w-11 h-11 md:w-10 md:h-10 rounded-xl border-2 border-primary bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
           >
@@ -101,8 +102,8 @@ export function CheckBoxes({ prayerName, target, done, onToggle }: InteractivePr
             type="button"
             role="checkbox"
             aria-checked={checked}
-            aria-label={`${prayerName} — صلاة القضاء رقم ${i + 1}${extra ? " (خارج الهدف)" : ""}`}
-            onClick={() => onToggle(i)}
+            aria-label={`${prayerName} — ${checked ? "إزالة صلاة مسجّلة" : "تسجيل صلاة قضاء"}${extra ? " (خارج الهدف)" : ""}`}
+            onClick={() => onChange(nextCountOnTap(done, i))}
             className={`w-10 h-10 md:w-8 md:h-8 rounded-xl md:rounded-lg border-2 flex items-center justify-center transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 ${
               checked
                 ? extra
@@ -118,7 +119,7 @@ export function CheckBoxes({ prayerName, target, done, onToggle }: InteractivePr
       {done >= target && (
         <button
           type="button"
-          onClick={() => onToggle(total)}
+          onClick={() => onChange(done + 1)}
           aria-label={`إضافة صلاة ${prayerName} خارج الهدف`}
           className="w-10 h-10 md:w-8 md:h-8 rounded-xl md:rounded-lg border-2 border-dashed border-border text-muted-foreground flex items-center justify-center hover:border-sand hover:text-accent active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         >

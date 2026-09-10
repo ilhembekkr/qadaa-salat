@@ -35,6 +35,8 @@ export interface Actions {
   adjustCount: (id: PrayerId, delta: number) => void;
   adjustTarget: (id: PrayerId, delta: number) => void;
   toggleToday: (id: PrayerId, index: number) => void;
+  /** Set today's count for a prayer directly (the tracker's +1 / −1 taps). */
+  setTodayCount: (id: PrayerId, n: number) => void;
   addExtra: (id: PrayerId) => void;
   setPrintPeriod: (p: PrintPeriod) => void;
   resetAll: () => void;
@@ -183,6 +185,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const current = derived.todayLog[id] ?? 0;
         setTodayCount(id, index < current ? index : index + 1);
       },
+      setTodayCount: (id, n) => setTodayCount(id, Math.max(0, Math.floor(n))),
       addExtra: (id) => setTodayCount(id, (derived.todayLog[id] ?? 0) + 1),
       setPrintPeriod: (printPeriod) => setState((s) => ({ ...s, printPeriod })),
       resetAll: () => {

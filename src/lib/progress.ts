@@ -1,6 +1,14 @@
 import { PRAYER_IDS, mapCounts, sumCounts, type PrayerCounts } from "./prayers";
 import type { AppState } from "./storage";
 
+/**
+ * Tap rule for the tracker row: a tap on a checked box removes ONE prayer, a tap on an
+ * unchecked box adds ONE. The boxes are a count, so no tap ever clears several at once.
+ */
+export function nextCountOnTap(done: number, index: number): number {
+  return index < done ? Math.max(0, done - 1) : done + 1;
+}
+
 export interface Forecast {
   status: "uncalculated" | "incomplete" | "scheduled" | "complete";
   daysByPrayer: Record<keyof PrayerCounts, number | null>;

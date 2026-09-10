@@ -148,3 +148,16 @@ test('existing saved plans and zero targets round-trip without migration', async
     assert.deepEqual(restored, s);
   } finally { delete global.localStorage; }
 });
+
+test('a tap on the tracker changes the count by exactly one', () => {
+  const { nextCountOnTap } = loadSource('src/lib/progress.ts');
+  // 3 checked of 5: tapping a checked box (any of 0..2) removes one, never clears the row.
+  assert.equal(nextCountOnTap(3, 0), 2);
+  assert.equal(nextCountOnTap(3, 1), 2);
+  assert.equal(nextCountOnTap(3, 2), 2);
+  // tapping an unchecked box adds one regardless of which one.
+  assert.equal(nextCountOnTap(3, 3), 4);
+  assert.equal(nextCountOnTap(3, 4), 4);
+  assert.equal(nextCountOnTap(0, 0), 1);
+  assert.equal(nextCountOnTap(1, 0), 0);
+});
