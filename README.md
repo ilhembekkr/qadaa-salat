@@ -32,3 +32,12 @@ docs/content-suggestions.md  content review and proposed copy upgrades
 
 - "تحميل الخطة PDF" opens the browser print dialog; the print stylesheet hides the page and renders the planner table (`PrintSheet`) on A4.
 - The plan's estimated duration is driven by the slowest prayer: remaining ÷ daily target.
+
+## Deploy (Cloudflare)
+
+```bash
+npx wrangler login   # once
+npm run deploy       # build + upload dist/ as static assets
+```
+
+Config lives in `wrangler.jsonc`.
