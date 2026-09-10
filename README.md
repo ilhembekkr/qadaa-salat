@@ -26,6 +26,8 @@ src/
   styles/             theme tokens, print stylesheet, self-hosted font
 docs/brief.md         original product brief
 docs/content-suggestions.md  content review and proposed copy upgrades
+docs/mobile-design-review.md mobile UX review (implemented)
+docs/promo-video.md   promo video script, slides and production notes
 ```
 
 ## Notes
