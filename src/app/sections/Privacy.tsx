@@ -43,7 +43,7 @@ export function Privacy() {
     flash({ kind: "ok", text: "تم حذف بياناتك من هذا الجهاز." });
   };
 
-  const btn = "w-full sm:w-auto flex items-center justify-center gap-2.5 px-6 py-3 bg-card border border-border rounded-xl font-semibold text-sm hover:bg-secondary transition-all";
+  const btn = "flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2.5 px-2 sm:px-6 py-3 bg-card border border-border rounded-xl font-semibold text-xs sm:text-sm text-center hover:bg-secondary transition-all";
 
   return (
     <section id="privacy" className="py-16 md:py-24 bg-background scroll-mt-16">
@@ -60,44 +60,44 @@ export function Privacy() {
           className="mb-10 md:mb-16"
         />
 
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-3 gap-3 md:gap-8 mb-8 md:mb-12">
           {BENEFITS.map(({ Icon, title, desc }) => (
-            <div key={title} className="bg-card border border-border rounded-2xl p-6 md:p-8 text-center hover:shadow-lg transition-all">
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-5">
-                <Icon className="w-7 h-7 text-primary" aria-hidden="true" />
+            <div key={title} className="bg-card border border-border rounded-2xl p-3 md:p-8 text-center hover:shadow-lg transition-all">
+              <div className="w-11 h-11 md:w-16 md:h-16 bg-primary/10 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto mb-2.5 md:mb-5">
+                <Icon className="w-5 h-5 md:w-7 md:h-7 text-primary" aria-hidden="true" />
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-2">{title}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">{desc}</p>
+              <h3 className="text-sm md:text-xl font-bold text-foreground md:mb-2 leading-snug">{title}</h3>
+              <p className="hidden md:block text-muted-foreground text-sm leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-3 sm:gap-4">
+        <div className="grid grid-cols-3 sm:flex sm:flex-wrap justify-center gap-3 sm:gap-4">
           <button type="button" onClick={() => downloadBackup(state)} className={btn}>
-            <FileDown className="w-4 h-4 text-primary" aria-hidden="true" />
+            <FileDown className="w-5 h-5 sm:w-4 sm:h-4 text-primary" aria-hidden="true" />
             نسخ احتياطي لخطتي
           </button>
           <button type="button" onClick={() => fileRef.current?.click()} className={btn}>
-            <RotateCcw className="w-4 h-4 text-primary" aria-hidden="true" />
+            <RotateCcw className="w-5 h-5 sm:w-4 sm:h-4 text-primary" aria-hidden="true" />
             استعادة خطة
           </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="application/json,.json"
-            className="hidden"
-            aria-label="اختر ملف النسخة الاحتياطية"
-            onChange={(e) => void onRestore(e.target.files?.[0])}
-          />
           <button
             type="button"
             onClick={onDelete}
-            className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-6 py-3 bg-card border border-destructive/30 text-destructive rounded-xl font-semibold text-sm hover:bg-destructive/5 transition-all"
+            className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2.5 px-2 sm:px-6 py-3 bg-card border border-destructive/30 text-destructive rounded-xl font-semibold text-xs sm:text-sm text-center hover:bg-destructive/5 transition-all"
           >
-            <Trash2 className="w-4 h-4" aria-hidden="true" />
+            <Trash2 className="w-5 h-5 sm:w-4 sm:h-4" aria-hidden="true" />
             حذف بياناتي
           </button>
         </div>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          aria-label="اختر ملف النسخة الاحتياطية"
+          onChange={(e) => void onRestore(e.target.files?.[0])}
+          />
         <p
           role="status"
           aria-live="polite"

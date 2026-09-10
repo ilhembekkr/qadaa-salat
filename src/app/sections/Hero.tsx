@@ -44,17 +44,17 @@ export function Hero() {
             <p className="text-base sm:text-lg text-muted-foreground leading-loose max-w-lg">
               احسب تقديراً لصلواتك الفائتة، أنشئ خطة قضاء تناسب وقتك، وتابع تقدمك بسهولة وخصوصية.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 pt-1">
+            <div className="grid grid-cols-2 sm:flex gap-3 pt-1">
               <a
                 href={live ? "#track" : "#calculator"}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-xl font-semibold text-base hover:bg-primary/90 transition-all shadow-md hover:shadow-lg"
+                className="inline-flex items-center justify-center gap-2 px-3 sm:px-8 py-3.5 sm:py-4 bg-primary text-primary-foreground rounded-xl font-semibold text-sm sm:text-base hover:bg-primary/90 transition-all shadow-md hover:shadow-lg"
               >
                 {live ? "سجّل صلوات اليوم" : "ابدأ حساب صلواتي"}
                 <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               </a>
               <a
                 href="#how-it-works"
-                className="inline-flex items-center justify-center px-8 py-4 bg-card border border-border text-foreground rounded-xl font-semibold text-base hover:bg-secondary transition-all"
+                className="inline-flex items-center justify-center px-3 sm:px-8 py-3.5 sm:py-4 bg-card border border-border text-foreground rounded-xl font-semibold text-sm sm:text-base hover:bg-secondary transition-all"
               >
                 كيف يعمل؟
               </a>
