@@ -1,0 +1,132 @@
+@custom-variant dark (&:is(.dark *));
+
+/*
+  Palette: warm cream ground, deep muted green primary, charcoal text,
+  sand accent. Contrast-checked for body text and badges on the cream ground.
+*/
+:root {
+  --font-size: 16px;
+  --font-family: 'Cairo Variable', 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+
+  --background: #faf7f1;
+  --foreground: #26312b;
+  --card: #fffdf9;
+  --card-foreground: #26312b;
+  --popover: #fffdf9;
+  --popover-foreground: #26312b;
+  --primary: #2f5d4a;
+  --primary-foreground: #ffffff;
+  --secondary: #edf1eb;
+  --secondary-foreground: #2f5d4a;
+  --muted: #f2eee6;
+  --muted-foreground: #666b65;
+  --accent: #8f6234;
+  --accent-foreground: #ffffff;
+  --sand: #c9a57a;
+  --destructive: #b4453c;
+  --destructive-foreground: #ffffff;
+  --border: rgba(38, 49, 43, 0.1);
+  --input: transparent;
+  --ring: #2f5d4a;
+  --footer: #26312b;
+  --footer-foreground: #faf7f1;
+  --radius: 0.75rem;
+  --font-weight-medium: 600;
+  --font-weight-normal: 400;
+}
+
+.dark {
+  --background: #171c19;
+  --foreground: #eceeea;
+  --card: #1f2622;
+  --card-foreground: #eceeea;
+  --popover: #1f2622;
+  --popover-foreground: #eceeea;
+  --primary: #7fb69a;
+  --primary-foreground: #10231a;
+  --secondary: #24302a;
+  --secondary-foreground: #eceeea;
+  --muted: #2a332e;
+  --muted-foreground: #a3aca6;
+  --accent: #d2a874;
+  --accent-foreground: #1a1a1a;
+  --sand: #d2a874;
+  --destructive: #e07068;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #7fb69a;
+  --footer: #0f1311;
+  --footer-foreground: #eceeea;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-sand: var(--sand);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-footer: var(--footer);
+  --color-footer-foreground: var(--footer-foreground);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    font-size: var(--font-size);
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-family);
+  }
+
+  h1, h2, h3, h4 {
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+  h1 { font-size: var(--text-2xl); }
+  h2 { font-size: var(--text-xl); }
+  h3 { font-size: var(--text-lg); }
+  h4 { font-size: var(--text-base); }
+
+  label, button {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  input {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+  }
+
+  /* Native date pickers: keep the calendar icon on the reading-start side in RTL. */
+  input[type="date"] {
+    text-align: start;
+  }
+}

@@ -1,0 +1,153 @@
+import type { ExcludedPeriod } from "./calc";
+import { PRAYER_IDS, fillCounts, isDateKey, mapCounts, toKey, type PrayerCounts } from "./prayers";
+
+export type PrintPeriod = "week" | "month" | "quarter";
+
+export const PRINT_DAYS: Record<PrintPeriod, number> = { week: 7, month: 30, quarter: 90 };
+export const PRINT_LABELS: Record<PrintPeriod, string> = { week: "أسبوع", month: "شهر", quarter: "3 أشهر" };
+
+/** Per-day log: how many qada prayers were performed for each prayer on that date. */
+export type DailyLog = Record<string, Partial<PrayerCounts>>;
+
+export interface AppState {
+  version: 1;
+  startDate: string;
+  endDate: string;
+  excluded: ExcludedPeriod[];
+  calculated: boolean;
+  /** Estimated missed prayers (the fixed baseline the user adjusts). */
+  counts: PrayerCounts;
+  /** Daily target per prayer. */
+  targets: PrayerCounts;
+  log: DailyLog;
+  printPeriod: PrintPeriod;
+}
+
+export const STORAGE_KEY = "qada-planner:state";
+export const MAX_TARGET = 50;
+
+export const defaultState = (): AppState => ({
+  version: 1,
+  startDate: "",
+  endDate: "",
+  excluded: [],
+  calculated: false,
+  counts: fillCounts(0),
+  targets: { fajr: 3, dhuhr: 1, asr: 2, maghrib: 1, isha: 2 },
+  log: {},
+  printPeriod: "month",
+});
+
+// ── Validation ────────────────────────────────────────────────────────────────
+
+const isRecord = (v: unknown): v is Record<string, unknown> =>
+  typeof v === "object" && v !== null && !Array.isArray(v);
+
+const nonNegInt = (v: unknown, fallback = 0): number =>
+  typeof v === "number" && Number.isFinite(v) && v >= 0 ? Math.floor(v) : fallback;
+
+const readCounts = (v: unknown, min: number, fallback: PrayerCounts): PrayerCounts => {
+  if (!isRecord(v)) return fallback;
+  return mapCounts((id) => Math.max(min, nonNegInt(v[id], fallback[id])));
+};
+
+/** Accepts anything (parsed JSON) and returns a well-formed state, or null if it is not ours. */
+export function sanitize(raw: unknown): AppState | null {
+  if (!isRecord(raw) || raw.version !== 1) return null;
+  const base = defaultState();
+
+  const excluded: ExcludedPeriod[] = Array.isArray(raw.excluded)
+    ? raw.excluded.filter(isRecord).map((p, i) => ({
+        id: typeof p.id === "string" && p.id ? p.id : `restored-${i}`,
+        label: typeof p.label === "string" ? p.label : "",
+        from: isDateKey(p.from) ? p.from : "",
+        to: isDateKey(p.to) ? p.to : "",
+      }))
+    : [];
+
+  const log: DailyLog = {};
+  if (isRecord(raw.log)) {
+    for (const [day, entry] of Object.entries(raw.log)) {
+      if (!isDateKey(day) || !isRecord(entry)) continue;
+      const clean: Partial<PrayerCounts> = {};
+      for (const id of PRAYER_IDS) {
+        const n = nonNegInt(entry[id]);
+        if (n > 0) clean[id] = n;
+      }
+      if (Object.keys(clean).length) log[day] = clean;
+    }
+  }
+
+  const printPeriod = raw.printPeriod;
+
+  return {
+    version: 1,
+    startDate: isDateKey(raw.startDate) ? raw.startDate : "",
+    endDate: isDateKey(raw.endDate) ? raw.endDate : "",
+    excluded,
+    calculated: raw.calculated === true,
+    counts: readCounts(raw.counts, 0, base.counts),
+    targets: mapCounts((id) => Math.min(MAX_TARGET, readCounts(raw.targets, 1, base.targets)[id])),
+    log,
+    printPeriod:
+      printPeriod === "week" || printPeriod === "month" || printPeriod === "quarter"
+        ? printPeriod
+        : "month",
+  };
+}
+
+// ── localStorage ──────────────────────────────────────────────────────────────
+
+export function loadState(): AppState | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? sanitize(JSON.parse(raw)) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveState(state: AppState): boolean {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function clearState(): void {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+// ── Backup / restore (JSON file on the user's device) ─────────────────────────
+
+export function downloadBackup(state: AppState): void {
+  const payload = { ...state, exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `qada-plan-${toKey(new Date())}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+export async function readBackup(file: File): Promise<AppState> {
+  const text = await file.text();
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    throw new Error("الملف ليس بصيغة JSON صالحة.");
+  }
+  const state = sanitize(parsed);
+  if (!state) throw new Error("هذا الملف ليس نسخة احتياطية من خطة القضاء.");
+  return state;
+}

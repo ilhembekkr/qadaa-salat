@@ -1,0 +1,3 @@
+- Icons: [Lucide](https://lucide.dev) — ISC license.
+- Font: [Cairo](https://fonts.google.com/specimen/Cairo) via [Fontsource](https://fontsource.org) — SIL Open Font License 1.1.
+- The visual foundation was adapted from the Figma Community template "Arabic RTL Fintech Landing Page".
