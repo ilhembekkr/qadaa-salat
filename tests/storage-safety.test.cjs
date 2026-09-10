@@ -78,3 +78,20 @@ test('two tabs converge: the later writer wins and the other tab can detect it b
     assert.deepEqual(stored.state, b);
   } finally { delete global.localStorage; }
 });
+
+test('backup files expose their export time and are summarised for the restore preview', async () => {
+  const { readBackupFile } = loadSource('src/lib/storage.ts');
+  const { summarizePlan } = loadSource('src/lib/progress.ts');
+  const { fillCounts } = loadSource('src/lib/prayers.ts');
+  const s = { ...defaultState(), calculated: true, counts: fillCounts(10),
+    log: { '2026-09-08': { fajr: 2 }, '2026-09-10': { asr: 1, isha: 0 }, '2026-09-09': {} } };
+  const file = new Blob([JSON.stringify({ ...s, exportedAt: '2026-09-10T08:00:00.000Z' })]);
+  const b = await readBackupFile(file);
+  assert.equal(b.exportedAt, '2026-09-10T08:00:00.000Z');
+  const sum = summarizePlan(b.state);
+  assert.deepEqual(sum, { calculated: true, estimated: 50, remaining: 47, recorded: 3, loggedDays: 2, lastLoggedDay: '2026-09-10', empty: false });
+  assert.equal((await readBackupFile(new Blob([JSON.stringify(s)]))).exportedAt, null);
+  assert.equal((await readBackupFile(new Blob([JSON.stringify({ ...s, exportedAt: 'yesterday' })]))).exportedAt, null);
+  assert.equal(summarizePlan(defaultState()).empty, true);
+  assert.equal(summarizePlan({ ...defaultState(), log: { '2026-09-10': { fajr: 1 } } }).empty, false);
+});

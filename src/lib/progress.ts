@@ -60,6 +60,37 @@ export function deriveProgress(state: AppState, today: string) {
   };
 }
 
+export interface PlanSummary {
+  calculated: boolean;
+  /** Estimated missed prayers. */
+  estimated: number;
+  remaining: number;
+  /** Raw prayers recorded in the log. */
+  recorded: number;
+  loggedDays: number;
+  /** Latest day with an entry (YYYY-MM-DD) or null. */
+  lastLoggedDay: string | null;
+  /** True when there is nothing worth protecting: no estimate and an empty log. */
+  empty: boolean;
+}
+
+/** Compact, comparable description of a plan — used before replacing one with another. */
+export function summarizePlan(state: AppState): PlanSummary {
+  const days = Object.keys(state.log).filter((d) => sumCounts(state.log[d] ?? {}) > 0).sort();
+  const recorded = days.reduce((acc, d) => acc + sumCounts(state.log[d] ?? {}), 0);
+  const estimated = sumCounts(state.counts);
+  const remaining = sumCounts(mapCounts((id) => Math.max(0, state.counts[id] - days.reduce((a, d) => a + (state.log[d]?.[id] ?? 0), 0))));
+  return {
+    calculated: state.calculated,
+    estimated,
+    remaining,
+    recorded,
+    loggedDays: days.length,
+    lastLoggedDay: days.length ? days[days.length - 1] : null,
+    empty: !state.calculated && recorded === 0,
+  };
+}
+
 /** Blank future work, beginning with only the outstanding requirement today. */
 export function printSchedule(state: AppState, today: string, days: number): PrayerCounts[] {
   const progress = deriveProgress(state, today);

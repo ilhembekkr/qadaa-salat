@@ -202,7 +202,13 @@ export function downloadBackup(state: AppState): void {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export async function readBackup(file: File): Promise<AppState> {
+export interface BackupFile {
+  state: AppState;
+  /** ISO time the backup was exported, when the file carries it. */
+  exportedAt: string | null;
+}
+
+export async function readBackupFile(file: Blob): Promise<BackupFile> {
   const text = await file.text();
   let parsed: unknown;
   try {
@@ -212,5 +218,13 @@ export async function readBackup(file: File): Promise<AppState> {
   }
   const state = sanitize(parsed);
   if (!state) throw new Error("هذا الملف ليس نسخة احتياطية من خطة القضاء.");
-  return state;
+  const exportedAt =
+    isRecord(parsed) && typeof parsed.exportedAt === "string" && !Number.isNaN(Date.parse(parsed.exportedAt))
+      ? parsed.exportedAt
+      : null;
+  return { state, exportedAt };
+}
+
+export async function readBackup(file: Blob): Promise<AppState> {
+  return (await readBackupFile(file)).state;
 }
