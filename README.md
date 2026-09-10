@@ -25,6 +25,7 @@ src/
   app/sections/       one file per landing-page section
   styles/             theme tokens, print stylesheet, self-hosted font
 docs/brief.md         original product brief
+docs/content-suggestions.md  content review and proposed copy upgrades
 ```
 
 ## Notes
