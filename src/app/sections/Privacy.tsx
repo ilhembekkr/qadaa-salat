@@ -8,7 +8,7 @@ import { SectionHeader } from "../components/SectionHeader";
 
 const BENEFITS = [
   { Icon: Shield, title: "بدون حساب", desc: "لا تسجيل دخول، ولا بريد إلكتروني، ولا تتبّع." },
-  { Icon: Lock, title: "بدون كلمة مرور", desc: "لا توجد بيانات حساب تُخترق أو تُنسى." },
+  { Icon: Lock, title: "بدون كلمة مرور", desc: "لا شيء يُخترق، ولا شيء يُنسى." },
   { Icon: HardDrive, title: "بياناتك على جهازك", desc: "جميع بياناتك تُخزَّن في متصفحك ولا تُرسَل لأي خادم." },
 ];
 

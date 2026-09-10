@@ -31,7 +31,7 @@ export function Footer() {
           </nav>
         </div>
         <div className="border-t border-footer-foreground/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-footer-foreground/35 text-sm">خطة القضاء — أداة مجانية خاصة</p>
+          <p className="text-footer-foreground/35 text-sm">خطة القضاء — أداة مجانية تحترم خصوصيتك</p>
           <p className="text-footer-foreground/60 text-sm font-medium">خطوات صغيرة، واستمرار بإذن الله.</p>
         </div>
       </div>

@@ -71,7 +71,7 @@ export function PrintablePlanner() {
 
           <div className="order-1 lg:order-2 space-y-7">
             <Pill>المتابعة الورقية</Pill>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight">تفضل المتابعة على الورق؟</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight">تفضّل المتابعة على الورق؟</h2>
             <p className="text-base sm:text-lg text-muted-foreground leading-loose">
               اطبع الأعمال المتبقية من الآن وفق أهدافك اليومية. تُخصم صلوات اليوم المسجّلة، وتتوقف الخانات عند اكتمال العدد المقدّر لكل صلاة. للأهداف الكبيرة، يظهر العدد الإضافي بجانب المربعات.
             </p>
