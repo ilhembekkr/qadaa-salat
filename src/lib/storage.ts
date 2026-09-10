@@ -114,22 +114,69 @@ export function sanitize(raw: unknown): AppState | null {
 
 // ── localStorage ──────────────────────────────────────────────────────────────
 
-export function loadState(): AppState | null {
+/**
+ * ok: reads and writes work.
+ * unavailable: storage throws (private mode, blocked site data) — nothing persists.
+ * failed: the last write was rejected (quota, disabled mid-session) — progress is at risk.
+ */
+export type StorageStatus = "ok" | "unavailable" | "failed";
+
+/** Every write carries the moment it happened so tabs can tell their own writes from others'. */
+export interface StoredEnvelope extends AppState {
+  savedAt?: string;
+}
+
+export function storageAvailable(): boolean {
+  try {
+    const probe = `${STORAGE_KEY}:probe`;
+    localStorage.setItem(probe, "1");
+    localStorage.removeItem(probe);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Reads the raw envelope (state + savedAt) or null if absent/corrupt/unavailable. */
+export function readStored(): { state: AppState; savedAt: string | null } | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? sanitize(JSON.parse(raw)) : null;
+    if (!raw) return null;
+    const parsed: unknown = JSON.parse(raw);
+    const state = sanitize(parsed);
+    if (!state) return null;
+    const savedAt =
+      typeof parsed === "object" && parsed !== null && typeof (parsed as StoredEnvelope).savedAt === "string"
+        ? (parsed as StoredEnvelope).savedAt!
+        : null;
+    return { state, savedAt };
+  } catch {
+    return null;
+  }
+}
+
+export function loadState(): AppState | null {
+  return readStored()?.state ?? null;
+}
+
+/** Writes state with a timestamp; returns the stamp, or null if storage rejected the write. */
+export function writeState(state: AppState, savedAt = new Date().toISOString()): string | null {
+  try {
+    const envelope: StoredEnvelope = { ...state, savedAt };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(envelope));
+    return savedAt;
   } catch {
     return null;
   }
 }
 
 export function saveState(state: AppState): boolean {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    return true;
-  } catch {
-    return false;
-  }
+  return writeState(state) !== null;
+}
+
+/** Structural equality of two states, ignoring the envelope stamp. */
+export function statesEqual(a: AppState, b: AppState): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
 }
 
 export function clearState(): void {

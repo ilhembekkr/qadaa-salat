@@ -1,6 +1,7 @@
 import { AppProvider, useApp } from "./state";
 import { MobileNav } from "./components/MobileNav";
 import { PrintSheet } from "./components/PrintSheet";
+import { StorageNotice } from "./components/StorageNotice";
 import { TodayStrip } from "./components/TodayStrip";
 import { About } from "./sections/About";
 import { Calculator } from "./sections/Calculator";
@@ -26,6 +27,7 @@ function Page() {
   return (
     <div className="app-screen min-h-screen bg-background text-foreground" dir="rtl">
       <Nav />
+      <StorageNotice />
       {app && <TodayStrip />}
       <main>
         <Hero />

@@ -77,3 +77,11 @@ test('print and preview show only outstanding scheduled work', () => {
   const preview = render('sections/PrintablePlanner', 'PrintablePlanner', s);
   assert.equal((preview.match(/w-3\.5 h-3\.5 border/g) ?? []).length, 1);
 });
+
+test('storage problems are surfaced with a backup action instead of failing silently', () => {
+  // render() provides a read-only localStorage stub, so the probe write fails → "unavailable".
+  const html = render('components/StorageNotice', 'StorageNotice', plan());
+  assert.match(html, /role="alert"/);
+  assert.match(text(html), /لا يمكن الحفظ على هذا الجهاز/);
+  assert.match(text(html), /نسخة احتياطية الآن/);
+});

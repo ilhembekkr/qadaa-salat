@@ -1,5 +1,5 @@
 import { deriveProgress } from "@/lib/progress";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { MENSTRUATION_MAX_DAYS, estimateMissedDays, newPeriodId, type ExcludedPeriod, type MenstruationSettings } from "@/lib/calc";
 import {
   fillCounts,
@@ -8,12 +8,16 @@ import {
 } from "@/lib/prayers";
 import {
   MAX_TARGET,
+  STORAGE_KEY,
   clearState,
   defaultState,
-  loadState,
-  saveState,
+  readStored,
+  statesEqual,
+  storageAvailable,
+  writeState,
   type AppState,
   type PrintPeriod,
+  type StorageStatus,
 } from "@/lib/storage";
 
 export type Derived = ReturnType<typeof deriveProgress>;
@@ -41,6 +45,10 @@ interface Ctx {
   state: AppState;
   derived: Derived;
   actions: Actions;
+  /** Whether the last write to this device succeeded. Surface it; never fail silently. */
+  storageStatus: StorageStatus;
+  /** Retry persisting the current state (after freeing space, for example). */
+  retrySave: () => void;
 }
 
 const AppContext = createContext<Ctx | null>(null);
@@ -63,12 +71,59 @@ export function allDatedExclusions(s: AppState): ExcludedPeriod[] {
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AppState>(() => loadState() ?? defaultState());
+  const [state, setState] = useState<AppState>(() => readStored()?.state ?? defaultState());
+  const [storageStatus, setStorageStatus] = useState<StorageStatus>(() => (storageAvailable() ? "ok" : "unavailable"));
   const today = useTodayKey();
+  /** Stamp of the last envelope this tab wrote or adopted; anything else in storage came from another tab. */
+  const lastSeenStamp = useRef<string | null>(readStored()?.savedAt ?? null);
+
+  const persist = useCallback(
+    (next: AppState) => {
+      const stored = readStored();
+      // Another tab already holds exactly this state: adopt its stamp, don't rewrite (avoids write ping-pong).
+      if (stored && statesEqual(stored.state, next)) {
+        lastSeenStamp.current = stored.savedAt;
+        setStorageStatus((s) => (s === "unavailable" ? s : "ok"));
+        return;
+      }
+      const stamp = writeState(next);
+      if (stamp) {
+        lastSeenStamp.current = stamp;
+        setStorageStatus("ok");
+      } else {
+        setStorageStatus((s) => (s === "unavailable" ? s : "failed"));
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
-    saveState(state);
-  }, [state]);
+    persist(state);
+  }, [state, persist]);
+
+  // Adopt changes written by other tabs (storage event) or while this tab was hidden (visibility).
+  useEffect(() => {
+    const adoptIfChanged = () => {
+      const stored = readStored();
+      if (!stored || stored.savedAt === lastSeenStamp.current) return;
+      lastSeenStamp.current = stored.savedAt;
+      setState((current) => (statesEqual(current, stored.state) ? current : stored.state));
+    };
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === null || e.key === STORAGE_KEY) adoptIfChanged();
+    };
+    const onVisible = () => {
+      if (document.visibilityState === "visible") adoptIfChanged();
+    };
+    window.addEventListener("storage", onStorage);
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+    };
+  }, []);
 
   const derived = useMemo<Derived>(() => deriveProgress(state, today), [state, today]);
 
@@ -139,7 +194,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [derived.todayLog, setTodayCount],
   );
 
-  const value = useMemo(() => ({ state, derived, actions }), [state, derived, actions]);
+  const retrySave = useCallback(() => {
+    if (!storageAvailable()) {
+      setStorageStatus("unavailable");
+      return;
+    }
+    setStorageStatus("ok");
+    persist(state);
+  }, [persist, state]);
+
+  const value = useMemo(
+    () => ({ state, derived, actions, storageStatus, retrySave }),
+    [state, derived, actions, storageStatus, retrySave],
+  );
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
 
