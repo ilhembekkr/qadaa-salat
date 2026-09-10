@@ -50,12 +50,7 @@ export function Privacy() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeader
           eyebrow="الخصوصية"
-          title={
-            <>
-              صلاتك أمر شخصي.
-              <span className="block text-primary">وبياناتك كذلك.</span>
-            </>
-          }
+          title="خصوصيتك محفوظة"
           subtitle="لا تحتاج إلى إنشاء حساب أو إدخال بريد إلكتروني. يتم حفظ خطتك وتقدمك محلياً على جهازك فقط."
           className="mb-6 md:mb-16"
         />
