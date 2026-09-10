@@ -17,8 +17,8 @@ export function TodayStrip() {
     return () => io.disconnect();
   }, []);
 
-  const total = derived.dailyTotal;
-  const done = Math.min(derived.todayDone, total);
+  const total = derived.todayRequired;
+  const done = derived.todayCredited;
   const ratio = total ? done / total : 0;
 
   return (

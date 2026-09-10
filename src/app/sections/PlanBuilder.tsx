@@ -1,15 +1,18 @@
+import { forecastFor } from "@/lib/progress";
 import { PRAYERS, addDays, arPrayers, durationFromDays, fillCounts, formatMonthYear } from "@/lib/prayers";
 import { MAX_TARGET } from "@/lib/storage";
-import { daysNeededFor, useApp } from "../state";
+import { useApp } from "../state";
 import { SectionHeader } from "../components/SectionHeader";
 import { Stepper } from "../components/Stepper";
 
 export function PlanBuilder() {
   const { state, derived, actions } = useApp();
-  const live = derived.daysNeeded !== null;
-  const days = live ? derived.daysNeeded! : daysNeededFor(fillCounts(1460), state.targets);
-  const finished = live && days === 0;
-  const endLabel = formatMonthYear(addDays(new Date(), days));
+  const live = state.calculated;
+  const forecast = live ? derived.forecast : forecastFor(fillCounts(1460), state.targets);
+  const days = forecast.days;
+  const finished = live && forecast.status === "complete";
+  const incomplete = forecast.status === "incomplete";
+  const endLabel = days === null ? "المدة غير محددة" : formatMonthYear(addDays(new Date(), days));
 
   return (
     <section id="plan" className="py-10 md:py-24 bg-secondary/40 scroll-mt-16">
@@ -24,14 +27,13 @@ export function PlanBuilder() {
         {/* Phone summary: two cells above the steppers */}
         <div className="lg:hidden grid grid-cols-2 gap-3 mb-4">
           <div className="bg-primary text-primary-foreground rounded-2xl px-4 py-3.5">
-            <div className="text-xs text-primary-foreground/70">يومياً</div>
-            <div className="text-2xl font-bold tabular-nums leading-tight">{derived.dailyTotal}</div>
-            <div className="text-xs text-primary-foreground/70 tabular-nums">{arPrayers(derived.dailyTotal * 7)} أسبوعياً</div>
+            <div className="text-xs text-primary-foreground/70">هدف اليوم</div>
+            <div className="text-2xl font-bold tabular-nums leading-tight">{derived.todayRequired}</div>
           </div>
           <div className="bg-card border border-border rounded-2xl px-4 py-3.5">
             <div className="text-xs text-muted-foreground">{finished ? "الخطة" : "الانتهاء المتوقع"}</div>
             <div className="text-lg font-bold text-foreground leading-tight">{finished ? "مكتملة" : endLabel}</div>
-            <div className="text-xs text-muted-foreground">{finished ? "بإذن الله" : live ? durationFromDays(days) : "أرقام توضيحية"}</div>
+            <div className="text-xs text-muted-foreground">{finished ? "بإذن الله" : incomplete ? "حدّد هدفاً لكل صلاة متبقية" : live ? durationFromDays(days!) : "أرقام توضيحية"}</div>
           </div>
         </div>
 
@@ -47,7 +49,14 @@ export function PlanBuilder() {
                     <span className="font-semibold text-foreground text-base md:text-lg">{p.name}</span>
                     {live && (
                       <div className="text-[13px] md:text-xs text-muted-foreground mt-0.5 tabular-nums">
-                        متبقٍ {arPrayers(derived.remainingByPrayer[p.id])}
+                        {derived.remainingByPrayer[p.id] === 0 ? "مكتملة" : <>متبقٍ {arPrayers(derived.remainingByPrayer[p.id])}</>}
+                        {derived.remainingByPrayer[p.id] > 0 && (
+                          <span className="block mt-1">
+                            {forecast.daysByPrayer[p.id] === null
+                              ? "لم يُحدَّد هدف يومي"
+                              : <>المدة التقديرية: {durationFromDays(forecast.daysByPrayer[p.id]!)}</>}
+                          </span>
+                        )}
                       </div>
                     )}
                   </div>
@@ -56,7 +65,7 @@ export function PlanBuilder() {
                     label={`هدف ${p.name} اليومي`}
                     onDecrement={() => actions.adjustTarget(p.id, -1)}
                     onIncrement={() => actions.adjustTarget(p.id, 1)}
-                    disableDecrement={state.targets[p.id] <= 1}
+                    disableDecrement={state.targets[p.id] <= 0}
                     disableIncrement={state.targets[p.id] >= MAX_TARGET}
                     value={
                       <span className="text-2xl font-bold text-foreground w-8 text-center tabular-nums" aria-live="polite">
@@ -78,18 +87,19 @@ export function PlanBuilder() {
               )}
             </div>
             <div>
-              <div className="text-5xl font-bold tabular-nums">{derived.dailyTotal}</div>
-              <div className="text-primary-foreground/65 text-sm mt-1">صلاة قضاء يومياً</div>
+              <div className="text-5xl font-bold tabular-nums">{derived.todayRequired}</div>
+              <div className="text-primary-foreground/65 text-sm mt-1">صلاة قضاء ضمن هدف اليوم</div>
             </div>
-            <div className="text-primary-foreground/65 text-sm tabular-nums">{arPrayers(derived.dailyTotal * 7)} أسبوعياً</div>
             <div className="h-px bg-primary-foreground/15" />
             {finished ? (
               <p className="text-lg font-semibold leading-relaxed">أكملت خطتك بإذن الله. يمكنك تعديل الأعداد إن كان هناك ما تبقّى.</p>
+            ) : incomplete ? (
+              <p className="text-sm leading-relaxed">حدّد هدفاً يومياً لكل صلاة متبقية لحساب المدة.</p>
             ) : (
               <div className="space-y-5">
                 <div>
                   <div className="text-xs tracking-wide text-primary-foreground/50 mb-1.5">المدة التقديرية لإكمال الخطة</div>
-                  <div className="text-2xl font-bold">{durationFromDays(days)}</div>
+                  <div className="text-2xl font-bold">{durationFromDays(days!)}</div>
                 </div>
                 <div>
                   <div className="text-xs tracking-wide text-primary-foreground/50 mb-1.5">التاريخ المتوقع للانتهاء</div>
@@ -105,6 +115,10 @@ export function PlanBuilder() {
             </p>
           </div>
         </div>
+        <p className="text-[13px] text-muted-foreground leading-relaxed mt-4 max-w-3xl">
+          نحسب مدة كل صلاة بحسب المتبقي منها وهدفها اليومي، مع التقريب إلى يوم كامل. مدة الخطة هي أطول هذه المدد، بافتراض تحقيق الأهداف يومياً.
+          {" "}يمكنك جعل الهدف صفراً؛ لن تُحسب مدة الخطة ما دامت صلاة متبقية دون هدف. أهداف الصلوات المكتملة لا تُنقل إلى غيرها.
+        </p>
       </div>
     </section>
   );

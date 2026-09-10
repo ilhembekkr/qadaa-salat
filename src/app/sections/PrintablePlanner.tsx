@@ -1,5 +1,6 @@
+import { printSchedule } from "@/lib/progress";
 import { Printer } from "lucide-react";
-import { PRAYERS, addDays, arDays, formatDayMonthShort, formatWeekdayShort } from "@/lib/prayers";
+import { PRAYERS, addDays, arDays, formatDayMonthShort, formatWeekdayShort, toKey } from "@/lib/prayers";
 import { PRINT_DAYS, PRINT_LABELS, type PrintPeriod } from "@/lib/storage";
 import { useApp } from "../state";
 import { Pill } from "../components/SectionHeader";
@@ -9,6 +10,7 @@ const PERIODS: PrintPeriod[] = ["week", "month", "quarter"];
 export function PrintablePlanner() {
   const { state, actions } = useApp();
   const today = new Date();
+  const schedule = printSchedule(state, toKey(today), 6);
 
   return (
     <section id="print" className="py-10 md:py-24 bg-secondary/40 scroll-mt-16">
@@ -42,9 +44,11 @@ export function PrintablePlanner() {
                           {PRAYERS.map((p) => (
                             <td key={p.id} className="py-2 px-1 text-center">
                               <div className="flex justify-center gap-0.5">
-                                {Array.from({ length: Math.min(state.targets[p.id], 3) }).map((_, i) => (
+                                {schedule[d][p.id] === 0 && <span>—</span>}
+                                {Array.from({ length: Math.min(schedule[d][p.id], 3) }).map((_, i) => (
                                   <div key={i} className="w-3.5 h-3.5 border border-border/70 rounded-sm" />
                                 ))}
+                                {schedule[d][p.id] > 3 && <span>+{schedule[d][p.id] - 3}</span>}
                               </div>
                             </td>
                           ))}
@@ -69,7 +73,7 @@ export function PrintablePlanner() {
             <Pill>المتابعة الورقية</Pill>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight">تفضل المتابعة على الورق؟</h2>
             <p className="text-base sm:text-lg text-muted-foreground leading-loose">
-              أنشئ خطة قابلة للطباعة وضع علامة بعد كل صلاة قضاء تؤديها. عدد المربعات في كل خانة يطابق هدفك اليومي.
+              اطبع الأعمال المتبقية من الآن وفق أهدافك اليومية. تُخصم صلوات اليوم المسجّلة، وتتوقف الخانات عند اكتمال العدد المقدّر لكل صلاة. للأهداف الكبيرة، يظهر العدد الإضافي بجانب المربعات.
             </p>
             <div className="flex gap-3" role="radiogroup" aria-label="مدة الخطة المطبوعة">
               {PERIODS.map((p) => (

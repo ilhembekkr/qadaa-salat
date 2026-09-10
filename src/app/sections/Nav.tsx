@@ -23,7 +23,7 @@ export function Nav() {
   const { state, derived } = useApp();
   const live = state.calculated;
   const links = live ? APP_LINKS : LANDING_LINKS;
-  const total = derived.dailyTotal;
+  const total = derived.todayRequired;
 
   return (
     <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border">
@@ -47,7 +47,7 @@ export function Nav() {
               className="inline-flex items-center gap-2 px-3.5 py-2 bg-secondary text-primary rounded-xl text-sm font-semibold hover:bg-secondary/70 transition-colors tabular-nums"
             >
               <span className="w-2 h-2 rounded-full bg-primary" aria-hidden="true" />
-              {Math.min(derived.todayDone, total)} / {total} اليوم
+              {derived.todayCredited} / {total} اليوم
             </a>
           ) : (
             <a

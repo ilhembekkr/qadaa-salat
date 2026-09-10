@@ -9,10 +9,10 @@ export function ProgressTiles({ className = "" }: { className?: string }) {
     <div className={`grid grid-cols-3 gap-3 md:gap-4 ${className}`}>
       <div className="bg-card border border-border rounded-2xl p-3.5 md:p-5 text-center">
         <div className="text-xl md:text-2xl font-bold text-primary tabular-nums">{fmt(derived.totalDone)}</div>
-        <div className="text-xs text-muted-foreground mt-1">تم قضاؤها</div>
+        <div className="text-xs text-muted-foreground mt-1">صلوات مسجّلة</div>
       </div>
       <div className="bg-card border border-border rounded-2xl p-3.5 md:p-5 text-center">
-        <div className="text-xl md:text-2xl font-bold text-foreground tabular-nums">{live ? pct(derived.overallPct) : "—"}</div>
+        <div className="text-xl md:text-2xl font-bold text-foreground tabular-nums">{live ? pct(derived.overallPct ?? 0) : "—"}</div>
         <div className="text-xs text-muted-foreground mt-1">مكتمل</div>
       </div>
       <div className="bg-card border border-border rounded-2xl p-3.5 md:p-5 text-center">

@@ -53,8 +53,8 @@ export function MobileNav() {
     return () => io.disconnect();
   }, [items]);
 
-  const total = derived.dailyTotal;
-  const ratio = total ? Math.min(1, derived.todayDone / total) : 0;
+  const total = derived.todayRequired;
+  const ratio = total ? derived.todayCredited / total : 0;
 
   return (
     <nav
@@ -78,7 +78,7 @@ export function MobileNav() {
                 <Icon className="w-5 h-5" aria-hidden="true" />
                 {label}
                 {showTicks && (
-                  <span className="flex gap-0.5 w-7 -mt-0.5" aria-label={`${Math.min(derived.todayDone, total)} من ${total} اليوم`}>
+                  <span className="flex gap-0.5 w-7 -mt-0.5" aria-label={`${derived.todayCredited} من ${total} اليوم`}>
                     {Array.from({ length: 5 }, (_, i) => (
                       <span key={i} className={`h-0.5 flex-1 rounded-full ${ratio >= (i + 1) / 5 ? "bg-primary" : "bg-border"}`} />
                     ))}

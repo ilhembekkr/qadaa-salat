@@ -103,7 +103,7 @@ export function sanitize(raw: unknown): AppState | null {
     menstruation,
     calculated: raw.calculated === true,
     counts: readCounts(raw.counts, 0, base.counts),
-    targets: mapCounts((id) => Math.min(MAX_TARGET, readCounts(raw.targets, 1, base.targets)[id])),
+    targets: mapCounts((id) => Math.min(MAX_TARGET, readCounts(raw.targets, 0, base.targets)[id])),
     log,
     printPeriod:
       printPeriod === "week" || printPeriod === "month" || printPeriod === "quarter"

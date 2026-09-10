@@ -1,12 +1,9 @@
+import { deriveProgress } from "@/lib/progress";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { MENSTRUATION_MAX_DAYS, estimateMissedDays, newPeriodId, type ExcludedPeriod, type MenstruationSettings } from "@/lib/calc";
 import {
-  PRAYER_IDS,
   fillCounts,
-  mapCounts,
-  sumCounts,
   toKey,
-  type PrayerCounts,
   type PrayerId,
 } from "@/lib/prayers";
 import {
@@ -19,20 +16,7 @@ import {
   type PrintPeriod,
 } from "@/lib/storage";
 
-export interface Derived {
-  today: string;
-  doneByPrayer: PrayerCounts;
-  totalDone: number;
-  totalMissed: number;
-  remainingByPrayer: PrayerCounts;
-  totalRemaining: number;
-  overallPct: number;
-  dailyTotal: number;
-  todayLog: Partial<PrayerCounts>;
-  todayDone: number;
-  /** Days to finish at the current targets, or null before the first calculation. */
-  daysNeeded: number | null;
-}
+export type Derived = ReturnType<typeof deriveProgress>;
 
 export type PeriodList = "excluded" | "postpartum";
 
@@ -78,10 +62,6 @@ export function allDatedExclusions(s: AppState): ExcludedPeriod[] {
   return s.menstruation.enabled ? [...s.excluded, ...s.postpartum] : s.excluded;
 }
 
-export function daysNeededFor(remaining: PrayerCounts, targets: PrayerCounts): number {
-  return Math.max(0, ...PRAYER_IDS.map((id) => Math.ceil(remaining[id] / Math.max(1, targets[id]))));
-}
-
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>(() => loadState() ?? defaultState());
   const today = useTodayKey();
@@ -90,29 +70,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     saveState(state);
   }, [state]);
 
-  const derived = useMemo<Derived>(() => {
-    const entries = Object.values(state.log);
-    const doneByPrayer = mapCounts((id) => entries.reduce((acc, d) => acc + (d[id] ?? 0), 0));
-    const totalDone = sumCounts(doneByPrayer);
-    const totalMissed = sumCounts(state.counts);
-    const remainingByPrayer = mapCounts((id) => Math.max(0, state.counts[id] - doneByPrayer[id]));
-    const totalRemaining = sumCounts(remainingByPrayer);
-    const overallPct = totalMissed > 0 ? Math.min(100, Math.round((totalDone / totalMissed) * 100)) : 0;
-    const todayLog = state.log[today] ?? {};
-    return {
-      today,
-      doneByPrayer,
-      totalDone,
-      totalMissed,
-      remainingByPrayer,
-      totalRemaining,
-      overallPct,
-      dailyTotal: sumCounts(state.targets),
-      todayLog,
-      todayDone: sumCounts(todayLog),
-      daysNeeded: state.calculated ? daysNeededFor(remainingByPrayer, state.targets) : null,
-    };
-  }, [state, today]);
+  const derived = useMemo<Derived>(() => deriveProgress(state, today), [state, today]);
 
   const setTodayCount = useCallback(
     (id: PrayerId, n: number) =>
@@ -164,7 +122,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       adjustTarget: (id, delta) =>
         setState((s) => ({
           ...s,
-          targets: { ...s.targets, [id]: Math.min(MAX_TARGET, Math.max(1, s.targets[id] + delta)) },
+          targets: { ...s.targets, [id]: Math.min(MAX_TARGET, Math.max(0, s.targets[id] + delta)) },
         })),
       toggleToday: (id, index) => {
         const current = derived.todayLog[id] ?? 0;
