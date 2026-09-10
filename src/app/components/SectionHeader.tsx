@@ -25,9 +25,9 @@ export function SectionHeader({ eyebrow, title, subtitle, tone = "primary", alig
       <div className="mb-4">
         <Pill tone={tone}>{eyebrow}</Pill>
       </div>
-      <h2 className="text-4xl md:text-5xl font-bold text-foreground leading-tight mb-4">{title}</h2>
+      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight mb-3 md:mb-4">{title}</h2>
       {subtitle && (
-        <p className={`text-lg text-muted-foreground max-w-xl leading-relaxed ${alignCls}`}>{subtitle}</p>
+        <p className={`text-base sm:text-lg text-muted-foreground max-w-xl leading-relaxed ${alignCls}`}>{subtitle}</p>
       )}
     </div>
   );

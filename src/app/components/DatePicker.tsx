@@ -6,6 +6,7 @@ const LOCALE = "ar-u-nu-latn-ca-gregory";
 const monthFmt = new Intl.DateTimeFormat(LOCALE, { month: "long" });
 const fullFmt = new Intl.DateTimeFormat(LOCALE, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 const weekdayFmt = new Intl.DateTimeFormat(LOCALE, { weekday: "short" });
+const shortFmt = new Intl.DateTimeFormat(LOCALE, { day: "numeric", month: "numeric", year: "numeric" });
 
 const MONTHS = Array.from({ length: 12 }, (_, m) => monthFmt.format(new Date(2000, m, 1)));
 /** Week starts on Saturday (2000-01-01 was a Saturday). */
@@ -109,8 +110,8 @@ export function DatePicker({ id, value, onChange, min, max, placeholder = "اخ�
         onClick={() => (open ? setOpen(false) : openPicker())}
         className={`${triggerCls} w-full flex items-center justify-between gap-3 border border-border text-start transition-all focus:outline-none focus:ring-2 focus:ring-primary/25 hover:border-primary/40`}
       >
-        <span className={selected ? "text-foreground" : "text-muted-foreground/70"}>
-          {selected ? fullFmt.format(fromKey(selected)) : placeholder}
+        <span className={`truncate ${selected ? "text-foreground" : "text-muted-foreground/70"}`}>
+          {selected ? (size === "sm" ? shortFmt.format(fromKey(selected)) : fullFmt.format(fromKey(selected))) : placeholder}
         </span>
         <span className="flex items-center gap-1.5 flex-shrink-0">
           {selected && (
@@ -140,9 +141,16 @@ export function DatePicker({ id, value, onChange, min, max, placeholder = "اخ�
 
       {open && (
         <div
+          className="fixed inset-0 z-50 flex items-end justify-center p-4 pb-[max(1rem,env(safe-area-inset-bottom))] bg-foreground/30 sm:absolute sm:inset-auto sm:start-0 sm:top-full sm:mt-2 sm:block sm:p-0 sm:bg-transparent"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setOpen(false);
+          }}
+        >
+        <div
           role="dialog"
+          aria-modal="true"
           aria-label="اختيار التاريخ"
-          className="absolute z-50 start-0 mt-2 w-[19.5rem] max-w-[calc(100vw-2rem)] bg-card border border-border rounded-2xl shadow-2xl p-4 space-y-3"
+          className="w-full max-w-sm sm:w-[19.5rem] bg-card border border-border rounded-2xl shadow-2xl p-4 space-y-3"
         >
           <div className="flex items-center gap-2">
             <button
@@ -206,7 +214,7 @@ export function DatePicker({ id, value, onChange, min, max, placeholder = "اخ�
                   aria-label={fullFmt.format(fromKey(key))}
                   disabled={isDisabled(key)}
                   onClick={() => pick(key)}
-                  className={`h-9 rounded-lg text-sm tabular-nums transition-colors disabled:opacity-25 disabled:cursor-not-allowed ${
+                  className={`h-10 sm:h-9 rounded-lg text-sm tabular-nums transition-colors disabled:opacity-25 disabled:cursor-not-allowed ${
                     key === selected
                       ? "bg-primary text-primary-foreground font-bold"
                       : key === today
@@ -244,6 +252,7 @@ export function DatePicker({ id, value, onChange, min, max, placeholder = "اخ�
               مسح
             </button>
           </div>
+        </div>
         </div>
       )}
     </div>

@@ -15,20 +15,20 @@ export function Calculator() {
   const orderProblem = state.startDate && state.endDate && estimate.total === 0;
 
   return (
-    <section id="calculator" className="py-24 bg-background scroll-mt-16">
+    <section id="calculator" className="py-16 md:py-24 bg-background scroll-mt-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeader
           eyebrow="الحساب التقديري"
           tone="accent"
           title="ابدأ بتقدير صلواتك الفائتة"
           subtitle="التواريخ تقريبية ولا بأس بذلك — يمكنك تعديل كل عدد يدوياً بعد الحساب."
-          className="mb-16"
+          className="mb-10 md:mb-16"
         />
 
         <div className="grid lg:grid-cols-2 gap-10 items-start">
           {/* Inputs */}
           <form
-            className="bg-card border border-border rounded-2xl p-8 space-y-6"
+            className="bg-card border border-border rounded-2xl p-5 md:p-8 space-y-6"
             onSubmit={(e) => {
               e.preventDefault();
               if (canCalculate) actions.calculate();
@@ -214,7 +214,7 @@ export function Calculator() {
 
           {/* Results */}
           <div className="bg-card border border-border rounded-2xl overflow-hidden">
-            <div className="px-8 py-5 border-b border-border flex items-center justify-between">
+            <div className="px-5 md:px-8 py-5 border-b border-border flex items-center justify-between">
               <span className="font-bold text-foreground">نتائج التقدير</span>
               {state.calculated && (
                 <span className="text-xs text-muted-foreground bg-muted px-3 py-1 rounded-full">قابل للتعديل</span>
@@ -222,7 +222,7 @@ export function Calculator() {
             </div>
             <div className="divide-y divide-border">
               {PRAYERS.map((p) => (
-                <div key={p.id} className="px-8 py-4 flex items-center justify-between gap-4">
+                <div key={p.id} className="px-5 md:px-8 py-4 flex items-center justify-between gap-4">
                   <span className="font-semibold text-foreground">{p.name}</span>
                   {state.calculated ? (
                     <Stepper
@@ -238,7 +238,7 @@ export function Calculator() {
                           aria-label={`عدد صلوات ${p.name} الفائتة`}
                           value={state.counts[p.id]}
                           onChange={(e) => actions.setCount(p.id, e.target.valueAsNumber)}
-                          className="w-24 text-center font-bold text-foreground bg-transparent border border-transparent hover:border-border focus:border-border rounded-lg py-1 tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/25"
+                          className="w-20 sm:w-24 text-center font-bold text-foreground bg-transparent border border-transparent hover:border-border focus:border-border rounded-lg py-1 tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/25"
                         />
                       }
                     />
@@ -250,11 +250,11 @@ export function Calculator() {
             </div>
             {state.calculated && (
               <div className="border-t border-border">
-                <div className="px-8 py-5 bg-primary/5 flex items-center justify-between">
+                <div className="px-5 md:px-8 py-5 bg-primary/5 flex items-center justify-between">
                   <span className="text-sm font-semibold text-muted-foreground">الإجمالي</span>
                   <span className="text-2xl font-bold text-primary tabular-nums">{arPrayers(derived.totalMissed)}</span>
                 </div>
-                <div className="px-8 py-4 text-xs text-muted-foreground leading-relaxed flex flex-col gap-1.5">
+                <div className="px-5 md:px-8 py-4 text-xs text-muted-foreground leading-relaxed flex flex-col gap-1.5">
                   <span>
                     الفترة: {arDays(estimate.total)}
                     {estimate.excluded > 0 && <> — مستثنى منها {arDays(estimate.excluded)}</>}

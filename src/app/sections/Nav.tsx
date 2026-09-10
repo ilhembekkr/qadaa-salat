@@ -28,9 +28,10 @@ export function Nav() {
           </div>
           <a
             href="#calculator"
-            className="px-5 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all shadow-sm"
+            className="px-4 sm:px-5 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all shadow-sm"
           >
-            ابدأ حساب صلواتي
+            <span className="hidden sm:inline">ابدأ حساب صلواتي</span>
+            <span className="sm:hidden">ابدأ الآن</span>
           </a>
         </div>
       </div>

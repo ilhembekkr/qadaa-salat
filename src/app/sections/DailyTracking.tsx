@@ -13,25 +13,25 @@ export function DailyTracking() {
   const extra = Math.max(0, derived.todayDone - derived.dailyTotal);
 
   return (
-    <section id="track" className="py-24 bg-background scroll-mt-16">
+    <section id="track" className="py-16 md:py-24 bg-background scroll-mt-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-7">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          <div className="space-y-5 md:space-y-7 order-2 lg:order-1">
             <Pill tone="accent">المتابعة اليومية</Pill>
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">قضاء اليوم</h2>
-            <p className="text-lg text-muted-foreground leading-loose">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight">قضاء اليوم</h2>
+            <p className="text-base sm:text-lg text-muted-foreground leading-loose">
               سجّل ما أنجزته بنقرة واحدة لكل صلاة. التقدم يُحفظ تلقائياً على جهازك.
             </p>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-card border border-border rounded-2xl p-5 text-center">
+            <div className="grid grid-cols-3 gap-3 md:gap-4">
+              <div className="bg-card border border-border rounded-2xl p-4 md:p-5 text-center">
                 <div className="text-2xl font-bold text-foreground tabular-nums">{live ? pct(derived.overallPct) : "—"}</div>
                 <div className="text-xs text-muted-foreground mt-1">مكتمل</div>
               </div>
-              <div className="bg-card border border-border rounded-2xl p-5 text-center">
+              <div className="bg-card border border-border rounded-2xl p-4 md:p-5 text-center">
                 <div className="text-xl font-bold text-foreground tabular-nums">{fmt(derived.totalDone)}</div>
                 <div className="text-xs text-muted-foreground mt-1">تم قضاؤها</div>
               </div>
-              <div className="bg-card border border-border rounded-2xl p-5 text-center">
+              <div className="bg-card border border-border rounded-2xl p-4 md:p-5 text-center">
                 <div className="text-xl font-bold text-foreground tabular-nums">{live ? fmt(derived.totalRemaining) : "—"}</div>
                 <div className="text-xs text-muted-foreground mt-1">متبقية</div>
               </div>
@@ -44,7 +44,7 @@ export function DailyTracking() {
             )}
           </div>
 
-          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-xl">
+          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-xl order-1 lg:order-2">
             <div className="px-6 py-5 border-b border-border flex items-center justify-between">
               <span className="font-bold text-foreground">قضاء اليوم</span>
               <span className="text-sm text-muted-foreground">{formatDayLong(new Date())}</span>
@@ -55,7 +55,7 @@ export function DailyTracking() {
                 const total = Math.max(state.targets[p.id], done);
                 return (
                   <div key={p.id} className="px-6 py-4 flex items-center justify-between gap-4">
-                    <span className="font-semibold text-foreground w-20 flex-shrink-0">{p.name}</span>
+                    <span className="font-semibold text-foreground w-16 sm:w-20 flex-shrink-0">{p.name}</span>
                     <CheckBoxes prayerName={p.name} total={total} done={done} onToggle={(i) => actions.toggleToday(p.id, i)} />
                   </div>
                 );
@@ -64,7 +64,7 @@ export function DailyTracking() {
             <div className="px-6 py-5 bg-muted/30 space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground" aria-live="polite">
-                  أنجزت اليوم {derived.todayDone} من {derived.dailyTotal} صلوات القضاء
+                  أنجزت اليوم {Math.min(derived.todayDone, derived.dailyTotal)} من {derived.dailyTotal} صلوات القضاء
                   {extra > 0 && <span className="text-primary font-semibold"> (+{extra} إضافية)</span>}
                 </span>
                 <span className="font-bold text-primary">{pct(todayPct)}</span>

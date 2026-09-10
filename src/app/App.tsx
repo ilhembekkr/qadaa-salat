@@ -1,4 +1,5 @@
 import { AppProvider } from "./state";
+import { MobileNav } from "./components/MobileNav";
 import { PrintSheet } from "./components/PrintSheet";
 import { About } from "./sections/About";
 import { Calculator } from "./sections/Calculator";
@@ -31,6 +32,7 @@ export default function App() {
           <FinalCta />
         </main>
         <Footer />
+        <MobileNav />
       </div>
       <PrintSheet />
     </AppProvider>

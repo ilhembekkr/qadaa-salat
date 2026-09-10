@@ -15,7 +15,7 @@ export function Stepper({ value, label, onDecrement, onIncrement, size = "sm", d
   const btn =
     size === "lg"
       ? "w-10 h-10 rounded-xl border-2 border-border hover:border-primary hover:text-primary"
-      : "w-7 h-7 rounded-lg border border-border hover:bg-muted";
+      : "w-9 h-9 rounded-lg border border-border hover:bg-muted";
   const icon = size === "lg" ? "w-4 h-4" : "w-3.5 h-3.5 text-muted-foreground";
   const gap = size === "lg" ? "gap-5" : "gap-3";
   return (

@@ -41,9 +41,9 @@ export function Faq() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="py-24 bg-background scroll-mt-16">
+    <section id="faq" className="py-16 md:py-24 bg-background scroll-mt-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionHeader eyebrow="الأسئلة الشائعة" tone="accent" title="لديك أسئلة؟" className="mb-16" />
+        <SectionHeader eyebrow="الأسئلة الشائعة" tone="accent" title="لديك أسئلة؟" className="mb-10 md:mb-16" />
         <div className="space-y-3">
           {FAQS.map((faq, i) => {
             const isOpen = open === i;
@@ -56,7 +56,7 @@ export function Faq() {
                     aria-expanded={isOpen}
                     aria-controls={panelId}
                     onClick={() => setOpen(isOpen ? null : i)}
-                    className="w-full px-7 py-5 flex items-center justify-between text-right hover:bg-muted/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                    className="w-full px-5 md:px-7 py-4 md:py-5 flex items-center justify-between text-right hover:bg-muted/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
                   >
                     <span className="font-semibold text-foreground text-base pl-4">{faq.q}</span>
                     <ChevronDown
@@ -65,7 +65,7 @@ export function Faq() {
                     />
                   </button>
                 </h3>
-                <div id={panelId} hidden={!isOpen} className="px-7 pb-6">
+                <div id={panelId} hidden={!isOpen} className="px-5 md:px-7 pb-5 md:pb-6">
                   <p className="text-muted-foreground leading-loose">{faq.a}</p>
                 </div>
               </div>

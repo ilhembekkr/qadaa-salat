@@ -9,7 +9,7 @@ const LINKS: [string, string][] = [
 
 export function Footer() {
   return (
-    <footer className="bg-footer text-footer-foreground py-14">
+    <footer className="bg-footer text-footer-foreground pt-12 pb-28 lg:py-14">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-start gap-10 mb-10">
           <div className="space-y-3 max-w-xs">

@@ -11,23 +11,23 @@ export function PlanBuilder() {
   const finished = live && days === 0;
 
   return (
-    <section id="plan" className="py-24 bg-secondary/40 scroll-mt-16">
+    <section id="plan" className="py-16 md:py-24 bg-secondary/40 scroll-mt-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeader
           eyebrow="بناء الخطة"
           title="ابنِ خطة تناسب قدرتك"
           subtitle="اختر هدفاً يومياً مختلفاً لكل صلاة — الخطة تتكيف معك وليس العكس."
-          className="mb-16"
+          className="mb-10 md:mb-16"
         />
 
         <div className="grid lg:grid-cols-5 gap-8 items-start">
           <div className="lg:col-span-3 bg-card border border-border rounded-2xl overflow-hidden">
-            <div className="px-8 py-5 border-b border-border">
+            <div className="px-5 md:px-8 py-5 border-b border-border">
               <span className="font-bold text-foreground">الهدف اليومي لكل صلاة</span>
             </div>
             <div className="divide-y divide-border">
               {PRAYERS.map((p) => (
-                <div key={p.id} className="px-8 py-5 flex items-center justify-between gap-4">
+                <div key={p.id} className="px-5 md:px-8 py-5 flex items-center justify-between gap-4">
                   <div>
                     <span className="font-semibold text-foreground text-lg">{p.name}</span>
                     {live && (
@@ -54,7 +54,7 @@ export function PlanBuilder() {
             </div>
           </div>
 
-          <div className="lg:col-span-2 bg-primary rounded-2xl p-8 text-primary-foreground space-y-6 lg:sticky lg:top-24">
+          <div className="lg:col-span-2 bg-primary rounded-2xl p-6 md:p-8 text-primary-foreground space-y-6 lg:sticky lg:top-24">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-xl">خطتك الحالية</h3>
               {!live && (

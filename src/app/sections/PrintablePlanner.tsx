@@ -11,9 +11,9 @@ export function PrintablePlanner() {
   const today = new Date();
 
   return (
-    <section id="print" className="py-24 bg-secondary/40 scroll-mt-16">
+    <section id="print" className="py-16 md:py-24 bg-secondary/40 scroll-mt-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div className="order-2 lg:order-1">
             <div className="bg-card rounded-2xl shadow-2xl border border-border overflow-hidden max-w-sm mx-auto" aria-hidden="true">
               <div className="bg-primary px-6 py-3.5">
@@ -67,8 +67,8 @@ export function PrintablePlanner() {
 
           <div className="order-1 lg:order-2 space-y-7">
             <Pill>المتابعة الورقية</Pill>
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">تفضل المتابعة على الورق؟</h2>
-            <p className="text-lg text-muted-foreground leading-loose">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight">تفضل المتابعة على الورق؟</h2>
+            <p className="text-base sm:text-lg text-muted-foreground leading-loose">
               أنشئ خطة قابلة للطباعة وضع علامة بعد كل صلاة قضاء تؤديها. عدد المربعات في كل خانة يطابق هدفك اليومي.
             </p>
             <div className="flex gap-3" role="radiogroup" aria-label="مدة الخطة المطبوعة">

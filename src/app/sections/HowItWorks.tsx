@@ -24,12 +24,12 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-24 bg-secondary/40 scroll-mt-16">
+    <section id="how-it-works" className="py-16 md:py-24 bg-secondary/40 scroll-mt-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionHeader eyebrow="كيف يعمل" title="خطة واضحة في ثلاث خطوات" className="mb-16" />
+        <SectionHeader eyebrow="كيف يعمل" title="خطة واضحة في ثلاث خطوات" className="mb-10 md:mb-16" />
         <div className="grid md:grid-cols-3 gap-8">
           {STEPS.map(({ num, title, body, Icon }) => (
-            <div key={num} className="bg-card border border-border rounded-2xl p-8 hover:shadow-lg transition-all relative overflow-hidden">
+            <div key={num} className="bg-card border border-border rounded-2xl p-6 md:p-8 hover:shadow-lg transition-all relative overflow-hidden">
               <div className="absolute top-5 left-6 text-7xl font-bold text-border/60 select-none leading-none tabular-nums" aria-hidden="true">
                 {num}
               </div>

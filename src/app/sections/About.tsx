@@ -2,9 +2,9 @@ import { Calculator, Info } from "lucide-react";
 
 export function About() {
   return (
-    <section id="about" className="py-16 bg-secondary/40 scroll-mt-16">
+    <section id="about" className="py-12 md:py-16 bg-secondary/40 scroll-mt-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="bg-card border border-border rounded-2xl p-8 flex gap-5">
+        <div className="bg-card border border-border rounded-2xl p-5 md:p-8 flex gap-4 md:gap-5">
           <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
             <Info className="w-5 h-5 text-accent" aria-hidden="true" />
           </div>
@@ -17,7 +17,7 @@ export function About() {
           </div>
         </div>
 
-        <div id="method" className="bg-card border border-border rounded-2xl p-8 flex gap-5 scroll-mt-20">
+        <div id="method" className="bg-card border border-border rounded-2xl p-5 md:p-8 flex gap-4 md:gap-5 scroll-mt-20">
           <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
             <Calculator className="w-5 h-5 text-primary" aria-hidden="true" />
           </div>

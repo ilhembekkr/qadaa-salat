@@ -43,10 +43,10 @@ export function Privacy() {
     flash({ kind: "ok", text: "تم حذف بياناتك من هذا الجهاز." });
   };
 
-  const btn = "flex items-center gap-2.5 px-6 py-3 bg-card border border-border rounded-xl font-semibold text-sm hover:bg-secondary transition-all";
+  const btn = "w-full sm:w-auto flex items-center justify-center gap-2.5 px-6 py-3 bg-card border border-border rounded-xl font-semibold text-sm hover:bg-secondary transition-all";
 
   return (
-    <section id="privacy" className="py-24 bg-background scroll-mt-16">
+    <section id="privacy" className="py-16 md:py-24 bg-background scroll-mt-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeader
           eyebrow="الخصوصية"
@@ -57,12 +57,12 @@ export function Privacy() {
             </>
           }
           subtitle="لا تحتاج إلى إنشاء حساب أو إدخال بريد إلكتروني. يتم حفظ خطتك وتقدمك محلياً على جهازك فقط."
-          className="mb-16"
+          className="mb-10 md:mb-16"
         />
 
         <div className="grid md:grid-cols-3 gap-8 mb-12">
           {BENEFITS.map(({ Icon, title, desc }) => (
-            <div key={title} className="bg-card border border-border rounded-2xl p-8 text-center hover:shadow-lg transition-all">
+            <div key={title} className="bg-card border border-border rounded-2xl p-6 md:p-8 text-center hover:shadow-lg transition-all">
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-5">
                 <Icon className="w-7 h-7 text-primary" aria-hidden="true" />
               </div>
@@ -72,7 +72,7 @@ export function Privacy() {
           ))}
         </div>
 
-        <div className="flex flex-wrap justify-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-3 sm:gap-4">
           <button type="button" onClick={() => downloadBackup(state)} className={btn}>
             <FileDown className="w-4 h-4 text-primary" aria-hidden="true" />
             نسخ احتياطي لخطتي
@@ -92,7 +92,7 @@ export function Privacy() {
           <button
             type="button"
             onClick={onDelete}
-            className="flex items-center gap-2.5 px-6 py-3 bg-card border border-destructive/30 text-destructive rounded-xl font-semibold text-sm hover:bg-destructive/5 transition-all"
+            className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-6 py-3 bg-card border border-destructive/30 text-destructive rounded-xl font-semibold text-sm hover:bg-destructive/5 transition-all"
           >
             <Trash2 className="w-4 h-4" aria-hidden="true" />
             حذف بياناتي
