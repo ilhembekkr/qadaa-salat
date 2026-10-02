@@ -24,6 +24,8 @@ src/
   app/components/     Logo, SectionHeader, Stepper, CheckBoxes, PrintSheet
   app/sections/       one file per landing-page section
   styles/             theme tokens, print stylesheet, self-hosted font
+public/               favicon, apple-touch-icon and the in-page logo (icons/)
+docs/brand/app-icon.png  logo master (1254px); regenerate the sizes in public/ from it
 docs/brief.md         original product brief
 docs/content-suggestions.md  content review and proposed copy upgrades
 docs/mobile-design-review.md mobile UX review (implemented)
