@@ -93,3 +93,13 @@ test('first-run hint shows on the live tracker only before anything is logged', 
   assert.doesNotMatch(text(render('components/TrackerCard', 'TrackerCard', logged, { variant: 'live' })), /اضغط مربعاً/);
   assert.doesNotMatch(text(render('components/TrackerCard', 'TrackerCard', fresh, { variant: 'sample' })), /اضغط مربعاً/);
 });
+
+test('week glance labels fit a phone: one letter below sm, the full weekday name otherwise', () => {
+  const { formatWeekdayNarrow, formatWeekdayShort } = loadSource('src/lib/prayers.ts');
+  const html = render('components/WeekGlance', 'WeekGlance', plan());
+  const d = new Date();
+  assert.match(html, new RegExp(`<span class="sm:hidden" aria-hidden="true">${formatWeekdayNarrow(d)}</span>`));
+  assert.match(html, new RegExp(`<span class="sr-only sm:not-sr-only">${formatWeekdayShort(d)}</span>`));
+  assert.equal((html.match(/class="sm:hidden"/g) || []).length, 7);
+  assert.equal((html.match(/flex-1 min-w-0/g) || []).length, 7);
+});

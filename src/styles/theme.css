@@ -123,6 +123,15 @@
     font-family: var(--font-family);
   }
 
+  /*
+    Safety net: nothing inside the screen may widen the page. A single too-wide
+    element makes iOS Safari zoom the whole page out to fit it. `clip` (not
+    `hidden`) so the sticky header keeps working.
+  */
+  .app-screen {
+    overflow-x: clip;
+  }
+
   h1, h2, h3, h4 {
     font-weight: var(--font-weight-medium);
     line-height: 1.5;

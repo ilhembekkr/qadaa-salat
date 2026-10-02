@@ -38,6 +38,7 @@ const monthYearFmt = new Intl.DateTimeFormat(LOCALE, { month: "long", year: "num
 const shortDateFmt = new Intl.DateTimeFormat(LOCALE, { day: "numeric", month: "numeric" });
 const dayMonthShortFmt = new Intl.DateTimeFormat(LOCALE, { day: "numeric", month: "short" });
 const weekdayShortFmt = new Intl.DateTimeFormat(LOCALE, { weekday: "short" });
+const weekdayNarrowFmt = new Intl.DateTimeFormat(LOCALE, { weekday: "narrow" });
 
 export const fmt = (n: number): string => numberFmt.format(n);
 export const pct = (n: number): string => `${fmt(n)}٪`;
@@ -47,6 +48,8 @@ export const formatMonthYear = (d: Date): string => monthYearFmt.format(d);
 export const formatShortDate = (d: Date): string => shortDateFmt.format(d);
 export const formatDayMonthShort = (d: Date): string => dayMonthShortFmt.format(d);
 export const formatWeekdayShort = (d: Date): string => weekdayShortFmt.format(d);
+/** One letter (س ح ن ث ر خ ج): Arabic has no short weekday names, and seven full names do not fit a phone-width row. */
+export const formatWeekdayNarrow = (d: Date): string => weekdayNarrowFmt.format(d);
 
 interface ArForms {
   one: string;

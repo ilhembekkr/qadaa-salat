@@ -65,13 +65,13 @@ function AppHero() {
     <section id="top" className="pt-4 pb-8 md:pt-12 md:pb-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-16 items-start">
-          <div className="lg:order-2 space-y-4">
+          <div className="lg:order-2 space-y-4 min-w-0">
             <h1 className="sr-only lg:hidden">قضاء اليوم — {formatDayLong(new Date())}</h1>
             <TrackerCard variant="live" id="track" />
             <PlanStrip />
           </div>
 
-          <div className="lg:order-1 space-y-4 md:space-y-6">
+          <div className="lg:order-1 space-y-4 md:space-y-6 min-w-0">
             <div className="hidden lg:block space-y-3">
               <h1 className="text-5xl font-bold text-foreground leading-snug">قضاء اليوم</h1>
               <p className="text-lg text-muted-foreground leading-loose">
