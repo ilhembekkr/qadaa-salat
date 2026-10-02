@@ -1,0 +1,148 @@
+/*
+  Final CTA backdrop (FinalCta). A quieter cousin of the hero orbit: one
+  translucent disc and one thin gold orbit at the top-left, a smaller pair at
+  the bottom-right from `md` up, a faint vector watermark of the app mark on
+  the right, and a soft lighter-green glow behind the copy. Shapes tint from
+  `currentColor` (the section's text colour) so dark mode follows for free.
+  Only transform and opacity animate; the watermark never moves.
+*/
+.cta-backdrop {
+  color: var(--primary-foreground);
+}
+
+.cta-disc,
+.cta-orbit,
+.cta-glow,
+.cta-sphere,
+.cta-spark,
+.cta-mark {
+  position: absolute;
+}
+
+/* Oversized translucent discs, cut off by the section edges. */
+.cta-disc {
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle closest-side,
+    color-mix(in srgb, currentColor 6%, transparent) 0%,
+    color-mix(in srgb, currentColor 5%, transparent) 94%,
+    transparent 100%
+  );
+}
+.cta-disc--tl { width: 14rem; height: 14rem; left: -6rem; top: -6rem; }
+.cta-disc--br { width: 20rem; height: 20rem; right: -8rem; bottom: -9rem; }
+
+/* Hairline orbits. `--dot` is where the particle sits on the ring (0deg = right, clockwise). */
+.cta-orbit {
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--sand) 40%, transparent);
+}
+.cta-orbit--tl { width: 18rem; height: 18rem; left: -10rem; top: -10rem; --dot: 20deg; }
+.cta-orbit--br {
+  width: 26rem; height: 26rem; right: -10rem; bottom: -12rem; --dot: 215deg;
+  border-color: color-mix(in srgb, var(--sand) 28%, transparent);
+}
+
+/* The dot rides the ring: rotate a border-box-sized layer, pin the dot to its right edge. */
+.cta-orbit-dot {
+  position: absolute;
+  inset: -1px;
+  transform: rotate(var(--dot));
+}
+.cta-orbit-dot::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 0.625rem;
+  height: 0.625rem;
+  margin: -0.3125rem;
+  border-radius: 9999px;
+  background: var(--sand);
+  box-shadow: 0 0 10px 2px color-mix(in srgb, var(--sand) 35%, transparent);
+}
+.cta-orbit--br .cta-orbit-dot::before {
+  width: 0.5rem;
+  height: 0.5rem;
+  margin: -0.25rem;
+  box-shadow: none;
+  opacity: 0.8;
+}
+
+/* Lighter-green breath behind the copy; the section still reads as one block. */
+.cta-glow {
+  left: 50%;
+  top: 50%;
+  width: 60rem;
+  height: 36rem;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    ellipse closest-side,
+    color-mix(in srgb, currentColor 7%, transparent),
+    transparent
+  );
+}
+
+/* Two small particles, desktop only: a soft green sphere and a faint gold glow. */
+.cta-sphere {
+  width: 4.5rem;
+  height: 4.5rem;
+  left: 17%;
+  top: 58%;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, currentColor 16%, transparent) 0%,
+    color-mix(in srgb, currentColor 7%, transparent) 55%,
+    transparent 72%
+  );
+}
+.cta-spark {
+  width: 3rem;
+  height: 3rem;
+  left: 12.5%;
+  top: 68%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--sand) 32%, transparent), transparent 70%);
+}
+
+/* Brand watermark, clipped by the right edge. */
+.cta-mark {
+  top: 50%;
+  right: -42%;
+  height: 80%;
+  aspect-ratio: 1;
+  transform: translateY(-50%);
+  opacity: 0.04;
+}
+
+@media (min-width: 48rem) {
+  .cta-disc--tl { width: 24rem; height: 24rem; left: -8rem; top: -7rem; }
+  .cta-orbit--tl { width: 30rem; height: 30rem; left: -13rem; top: -14rem; --dot: 5deg; }
+  .cta-mark { right: -17%; height: 120%; }
+}
+
+@keyframes cta-sway {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+@keyframes cta-drift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-0.5rem); }
+}
+@keyframes cta-breathe {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.cta-sway { animation: cta-sway 20s ease-in-out infinite; }
+.cta-drift { animation: cta-drift 16s ease-in-out infinite; }
+.cta-breathe { animation: cta-breathe 14s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-sway,
+  .cta-drift,
+  .cta-breathe {
+    animation-play-state: paused;
+  }
+}
