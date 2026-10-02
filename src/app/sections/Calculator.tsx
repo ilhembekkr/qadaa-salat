@@ -29,16 +29,18 @@ export function Calculator({ collapsed = false }: Props) {
     setAgeAtPuberty(age);
     if (typeof year === "number" && year >= 1900 && year <= THIS_YEAR && age >= 8 && age <= 25) {
       actions.setDates(`${year + age}-01-01`, state.endDate);
+    } else {
+      actions.setDates("", state.endDate);
     }
   };
   const startPickerView = toKey(addDays(new Date(), -15 * 365));
   const estimate = estimateMissedDays(state.startDate, state.endDate, allDatedExclusions(state), state.menstruation);
   const cycle = state.menstruation;
-  const canCalculate = Boolean(state.startDate && state.endDate) && estimate.total > 0;
+  const canCalculate = Boolean(state.startDate && state.endDate) && state.endDate <= todayKey && estimate.total > 0;
   const orderProblem = state.startDate && state.endDate && estimate.total === 0;
 
   return (
-    <section id="calculator" className="py-10 md:py-24 bg-background scroll-mt-16">
+    <section id="calculator" className={`${collapsed ? "py-4" : "py-10 md:py-24"} bg-background scroll-mt-20`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {collapsed ? (
           <button

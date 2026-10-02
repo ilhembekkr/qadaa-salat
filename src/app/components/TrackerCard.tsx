@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 import { useState } from "react";
-import { PRAYERS, formatDayLong, pct, type PrayerId } from "@/lib/prayers";
+import { PRAYERS, fmt, formatDayLong, pct, type PrayerId } from "@/lib/prayers";
 import { useApp } from "../state";
 import { CheckBoxes, StaticCheckBoxes } from "./CheckBoxes";
 
@@ -54,11 +54,20 @@ export function TrackerCard({ variant, id, className = "" }: Props) {
   const overall = live ? (state.calculated ? derived.overallPct : null) : 28;
 
   return (
-    <div id={id} className={`bg-card rounded-3xl md:rounded-2xl shadow-xl border border-border overflow-hidden scroll-mt-20 ${className}`}>
+    <div id={id} className={`bg-card rounded-2xl shadow-sm border border-border overflow-hidden scroll-mt-20 ${className}`}>
       <div className="bg-primary px-5 md:px-6 py-3.5 md:py-4 flex items-center justify-between">
         <span className="text-primary-foreground font-semibold">قضاء اليوم</span>
         <span className="text-primary-foreground/70 text-sm">{formatDayLong(new Date())}</span>
       </div>
+
+      {todayTotal > 0 && (
+        <div className="px-5 md:px-6 py-5 border-b border-border bg-secondary/40">
+          <p className="text-sm text-muted-foreground mb-2">خطوة بخطوة نحو هدف اليوم</p>
+          <p className="text-3xl font-bold text-primary tabular-nums" aria-live="polite">
+            {fmt(todayDone)} <span className="text-lg font-medium text-muted-foreground">من {fmt(todayTotal)} صلوات</span>
+          </p>
+        </div>
+      )}
 
       {showHint && (
         <div className="px-5 md:px-6 py-3 bg-secondary/70 border-b border-border flex items-start gap-3 text-[13px] leading-relaxed">

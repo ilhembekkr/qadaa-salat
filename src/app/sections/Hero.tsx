@@ -25,10 +25,11 @@ function LandingHero() {
               <Lock className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
               <span className="text-xs font-semibold text-primary">بدون حساب — بياناتك محفوظة على جهازك</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-snug">
+            <h1 className="text-[2.5rem] sm:text-[3.25rem] lg:text-[4rem] font-bold text-foreground leading-snug">
               رتّب قضاء صلواتك،
-              <span className="block mt-1 text-primary">خطوة بخطوة</span>
+              <span className="block mt-1 text-sand">خطوة بخطوة</span>
             </h1>
+            <HeroOrbitVisual className="lg:hidden" />
             <p className="text-base sm:text-lg text-muted-foreground leading-loose max-w-lg">
               احسب تقديراً لصلواتك الفائتة، أنشئ خطة قضاء تناسب وقتك، وتابع تقدمك بسهولة وخصوصية.
             </p>
@@ -49,8 +50,7 @@ function LandingHero() {
             </div>
           </div>
 
-          {/* Phones: visual first, above the headline. lg+: second column (the left side in RTL). */}
-          <HeroOrbitVisual className="order-first lg:order-2" />
+          <HeroOrbitVisual className="hidden lg:block lg:order-2" />
         </div>
       </div>
     </section>

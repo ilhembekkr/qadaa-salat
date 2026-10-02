@@ -1,3 +1,4 @@
+import { SectionDisclosure } from "./components/SectionDisclosure";
 import { AppProvider, useApp } from "./state";
 import { MobileNav } from "./components/MobileNav";
 import { PrintSheet } from "./components/PrintSheet";
@@ -31,21 +32,20 @@ function Page() {
       {app && <TodayStrip />}
       <main>
         <Hero />
+        {!app && <HowItWorks />}
+        <Calculator collapsed={app} />
+        {app ? (
+          <SectionDisclosure title="تعديل أهداف الخطة"><PlanBuilder /></SectionDisclosure>
+        ) : <PlanBuilder />}
+        {!app && <DailyTracking />}
         {app ? (
           <>
-            <PlanBuilder />
-            <PrintablePlanner />
-            <Privacy />
-            <Calculator collapsed />
-            <About />
-            <Faq />
+            <SectionDisclosure title="طباعة جدول القضاء"><PrintablePlanner /></SectionDisclosure>
+            <SectionDisclosure title="الخصوصية والنسخ الاحتياطي"><Privacy /></SectionDisclosure>
+            <SectionDisclosure title="عن التطبيق والأسئلة الشائعة"><About /><Faq /></SectionDisclosure>
           </>
         ) : (
           <>
-            <HowItWorks />
-            <Calculator />
-            <PlanBuilder />
-            <DailyTracking />
             <PrintablePlanner />
             <Privacy />
             <About />
