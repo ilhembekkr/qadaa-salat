@@ -13,7 +13,7 @@ export function Footer() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-start gap-10 mb-10">
           <div className="space-y-3 max-w-xs">
-            <Logo />
+            <Logo tone="light" />
             <p className="text-footer-foreground/55 text-sm leading-relaxed">
               أداة خاصة لتنظيم وتتبع صلوات القضاء. بياناتك على جهازك فقط.
             </p>

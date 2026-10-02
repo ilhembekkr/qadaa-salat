@@ -1,9 +1,15 @@
-/** Brand mark + wordmark. Icon sizes live in public/icons (master: docs/brand/app-icon.png). */
-export function Logo({ className = "" }: { className?: string }) {
+interface Props {
+  className?: string;
+  /** "dark" is the green tile (light backgrounds); "light" is the cream tile for the footer. */
+  tone?: "dark" | "light";
+}
+
+/** Brand mark + wordmark. Icon sizes live in public/icons (masters: docs/brand/app-icon*.png). */
+export function Logo({ className = "", tone = "dark" }: Props) {
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
       <img
-        src="/icons/icon-144.png"
+        src={tone === "light" ? "/icons/icon-light-144.png" : "/icons/icon-144.png"}
         alt=""
         width={36}
         height={36}
