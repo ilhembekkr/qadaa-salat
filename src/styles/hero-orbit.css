@@ -1,0 +1,107 @@
+/*
+  Landing hero visual (HeroOrbitVisual). Only transform and opacity animate so
+  everything stays on the compositor; depth comes from gradients, not filters.
+*/
+.hero-orbit-spin {
+  animation: hero-orbit-spin var(--period) linear infinite;
+  animation-delay: var(--phase);
+}
+.hero-orbit-spin--reverse {
+  animation-direction: reverse;
+}
+.hero-orbit-float {
+  animation: hero-orbit-float 7s ease-in-out infinite;
+}
+.hero-orbit-pulse {
+  animation: hero-orbit-pulse var(--period) ease-in-out infinite;
+  animation-delay: var(--phase);
+}
+
+@keyframes hero-orbit-spin {
+  to { transform: rotate(1turn); }
+}
+@keyframes hero-orbit-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3%); }
+}
+@keyframes hero-orbit-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-orbit-spin,
+  .hero-orbit-float,
+  .hero-orbit-pulse {
+    animation-play-state: paused;
+  }
+}
+
+.hero-orbit-path {
+  stroke-width: 1;
+}
+.hero-orbit-path--green {
+  stroke: var(--primary);
+  stroke-opacity: 0.28;
+}
+.hero-orbit-path--gold {
+  stroke: var(--sand);
+  stroke-opacity: 0.6;
+}
+.hero-orbit-path[stroke-dasharray] {
+  stroke-opacity: 0.22;
+}
+
+.hero-orbit-sphere {
+  display: block;
+  border-radius: 9999px;
+}
+.hero-orbit-sphere--green {
+  background: radial-gradient(
+    circle at 32% 30%,
+    color-mix(in srgb, var(--primary) 55%, white),
+    var(--primary) 45%,
+    color-mix(in srgb, var(--primary) 65%, black)
+  );
+}
+.hero-orbit-sphere--gold {
+  background: radial-gradient(
+    circle at 32% 30%,
+    color-mix(in srgb, var(--sand) 55%, white),
+    var(--sand) 50%,
+    var(--accent)
+  );
+}
+.hero-orbit-sphere--glow {
+  box-shadow: 0 0 10px 2px color-mix(in srgb, var(--sand) 45%, transparent);
+}
+
+.hero-orbit-glow {
+  aspect-ratio: 1;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--sand) 70%, white) 0%,
+    color-mix(in srgb, var(--sand) 35%, transparent) 35%,
+    transparent 70%
+  );
+}
+
+.hero-orbit-blob {
+  aspect-ratio: 1;
+  background: radial-gradient(circle, color-mix(in srgb, var(--primary) 11%, transparent), transparent 70%);
+}
+.hero-orbit-blob--sand {
+  background: radial-gradient(circle, color-mix(in srgb, var(--sand) 14%, transparent), transparent 70%);
+}
+.hero-orbit-blob--disc {
+  background: radial-gradient(circle, color-mix(in srgb, var(--secondary) 70%, transparent) 58%, transparent 72%);
+}
+
+.hero-orbit-halo {
+  background: radial-gradient(circle, color-mix(in srgb, var(--card) 85%, transparent) 40%, transparent 70%);
+}
+.hero-orbit-disc {
+  box-shadow:
+    0 22px 44px -14px color-mix(in srgb, var(--foreground) 28%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--foreground) 5%, transparent);
+}

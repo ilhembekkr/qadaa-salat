@@ -1,15 +1,16 @@
 import { ArrowLeft, Lock } from "lucide-react";
 import { formatDayLong } from "@/lib/prayers";
 import { useApp } from "../state";
+import { HeroOrbitVisual } from "../components/HeroOrbitVisual";
 import { PlanStrip } from "../components/PlanStrip";
 import { ProgressTiles } from "../components/ProgressTiles";
 import { TrackerCard } from "../components/TrackerCard";
 import { WeekGlance } from "../components/WeekGlance";
 
-/** Landing hero (no plan yet): marketing copy + read-only preview. */
+/** Landing hero (no plan yet): marketing copy + animated orbit visual. */
 function LandingHero() {
   return (
-    <section id="top" className="relative overflow-hidden pt-8 pb-12 md:pt-20 md:pb-28">
+    <section id="top" className="relative overflow-hidden pt-6 pb-12 md:pt-20 md:pb-28">
       <div
         className="absolute inset-0 opacity-[0.05] pointer-events-none"
         style={{
@@ -18,7 +19,7 @@ function LandingHero() {
         }}
       />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-16 items-center">
           <div className="space-y-4 md:space-y-7">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 md:px-4 md:py-2 bg-secondary rounded-full border border-primary/15">
               <Lock className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
@@ -48,11 +49,8 @@ function LandingHero() {
             </div>
           </div>
 
-          <div className="relative">
-            <div className="absolute -inset-8 bg-gradient-to-br from-primary/10 to-accent/10 blur-3xl rounded-full pointer-events-none" />
-            <TrackerCard variant="sample" className="relative shadow-2xl" />
-            <p className="text-center text-[13px] text-muted-foreground mt-3">معاينة توضيحية — ستعرض خطتك الفعلية بعد الحساب</p>
-          </div>
+          {/* Phones: visual first, above the headline. lg+: second column (the left side in RTL). */}
+          <HeroOrbitVisual className="order-first lg:order-2" />
         </div>
       </div>
     </section>
