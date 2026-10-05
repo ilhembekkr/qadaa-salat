@@ -1,4 +1,5 @@
 import { FullDayRecorder } from "./FullDayRecorder";
+import { IstighfarReminder } from "./IstighfarReminder";
 import { X } from "lucide-react";
 import { useState } from "react";
 import { PRAYERS, fmt, formatDayLong, pct, type PrayerId } from "@/lib/prayers";
@@ -136,9 +137,7 @@ export function TrackerCard({ variant, id, className = "" }: Props) {
         <div className="h-2 bg-border rounded-full overflow-hidden">
           <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${todayPct}%` }} />
         </div>
-        {live && derived.todayComplete && (
-          <p className="text-sm text-primary">أتممت هدف اليوم، تقبّل الله منك.</p>
-        )}
+        {live && <IstighfarReminder />}
         {overall !== null && (
           <div className="flex items-center justify-between pt-0.5">
             <span className="text-xs text-muted-foreground">التقدم الإجمالي</span>
