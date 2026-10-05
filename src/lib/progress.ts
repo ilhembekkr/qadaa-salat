@@ -104,3 +104,18 @@ export function printSchedule(state: AppState, today: string, days: number): Pra
     return required;
   }));
 }
+
+/** Only record complete sets that still remain; never silently record a partial day. */
+export function recordFullDays(state: AppState, today: string, days: number): AppState {
+  if (!Number.isSafeInteger(days) || days < 1) return state;
+  const remaining = deriveProgress(state, today).remainingByPrayer;
+  if (state.calculated && PRAYER_IDS.some((id) => remaining[id] < days)) return state;
+  const day = mapCounts((id) => (state.log[today]?.[id] ?? 0) + days);
+  if (PRAYER_IDS.some((id) => !Number.isSafeInteger(day[id]))) return state;
+  return { ...state, log: { ...state.log, [today]: day } };
+}
+
+/** Undo only while the recorded log is still current, preserving later edits and imports. */
+export function undoFullDays(state: AppState, expected: AppState["log"], previous: AppState["log"]): AppState {
+  return state.log === expected ? { ...state, log: previous } : state;
+}

@@ -1,3 +1,4 @@
+import { FullDayRecorder } from "./FullDayRecorder";
 import { X } from "lucide-react";
 import { useState } from "react";
 import { PRAYERS, fmt, formatDayLong, pct, type PrayerId } from "@/lib/prayers";
@@ -85,6 +86,8 @@ export function TrackerCard({ variant, id, className = "" }: Props) {
         </div>
       )}
 
+      {live && <FullDayRecorder />}
+
       <div className="divide-y divide-border">
         {PRAYERS.map((p) => {
           const done = derived.todayLog[p.id] ?? 0;
@@ -92,6 +95,9 @@ export function TrackerCard({ variant, id, className = "" }: Props) {
             <div key={p.id} className="px-5 md:px-6 py-3 md:py-3.5 flex items-center justify-between gap-4">
               <span className="font-semibold text-foreground w-16 sm:w-20 flex-shrink-0">
                 {p.name}
+                {live && state.calculated && derived.remainingByPrayer[p.id] > 0 && (
+                  <span className="block text-xs font-normal text-muted-foreground mt-1">متبقٍ {fmt(derived.remainingByPrayer[p.id])}</span>
+                )}
                 {live && state.calculated && derived.remainingByPrayer[p.id] === 0 && (
                   <span className="block text-xs font-normal text-muted-foreground mt-1">مكتملة</span>
                 )}

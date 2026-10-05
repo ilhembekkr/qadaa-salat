@@ -1,4 +1,4 @@
-import { deriveProgress } from "@/lib/progress";
+import { deriveProgress, recordFullDays, undoFullDays } from "@/lib/progress";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { MENSTRUATION_MAX_DAYS, estimateMissedDays, newPeriodId, type ExcludedPeriod, type MenstruationSettings } from "@/lib/calc";
 import {
@@ -38,6 +38,8 @@ export interface Actions {
   /** Set today's count for a prayer directly (the tracker's +1 / −1 taps). */
   setTodayCount: (id: PrayerId, n: number) => void;
   addExtra: (id: PrayerId) => void;
+  recordFullDays: (days: number) => void;
+  undoFullDays: () => void;
   setPrintPeriod: (p: PrintPeriod) => void;
   resetAll: () => void;
   replaceState: (s: AppState) => void;
@@ -49,6 +51,7 @@ interface Ctx {
   actions: Actions;
   /** Whether the last write to this device succeeded. Surface it; never fail silently. */
   storageStatus: StorageStatus;
+  fullDaysRecorded: number | null;
   /** Retry persisting the current state (after freeing space, for example). */
   retrySave: () => void;
 }
@@ -76,6 +79,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>(() => readStored()?.state ?? defaultState());
   const [storageStatus, setStorageStatus] = useState<StorageStatus>(() => (storageAvailable() ? "ok" : "unavailable"));
   const today = useTodayKey();
+  const fullDaysUndo = useRef<{ before: AppState["log"]; after: AppState["log"]; today: string; days: number } | null>(null);
   /** Stamp of the last envelope this tab wrote or adopted; anything else in storage came from another tab. */
   const lastSeenStamp = useRef<string | null>(readStored()?.savedAt ?? null);
 
@@ -187,6 +191,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
       },
       setTodayCount: (id, n) => setTodayCount(id, Math.max(0, Math.floor(n))),
       addExtra: (id) => setTodayCount(id, (derived.todayLog[id] ?? 0) + 1),
+      recordFullDays: (days) => setState((s) => {
+        const next = recordFullDays(s, today, days);
+        if (next !== s) fullDaysUndo.current = { before: s.log, after: next.log, today, days };
+        return next;
+      }),
+      undoFullDays: () => setState((s) => {
+        const entry = fullDaysUndo.current;
+        return entry && entry.today === today ? undoFullDays(s, entry.after, entry.before) : s;
+      }),
       setPrintPeriod: (printPeriod) => setState((s) => ({ ...s, printPeriod })),
       resetAll: () => {
         clearState();
@@ -194,7 +207,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       },
       replaceState: (next) => setState(next),
     }),
-    [derived.todayLog, setTodayCount],
+    [derived.todayLog, setTodayCount, today],
   );
 
   const retrySave = useCallback(() => {
@@ -206,9 +219,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     persist(state);
   }, [persist, state]);
 
+  const entry = fullDaysUndo.current;
+  const fullDaysRecorded = entry?.after === state.log && entry.today === today ? entry.days : null;
   const value = useMemo(
-    () => ({ state, derived, actions, storageStatus, retrySave }),
-    [state, derived, actions, storageStatus, retrySave],
+    () => ({ state, derived, actions, storageStatus, retrySave, fullDaysRecorded }),
+    [state, derived, actions, storageStatus, retrySave, fullDaysRecorded],
   );
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

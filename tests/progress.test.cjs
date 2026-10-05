@@ -161,3 +161,41 @@ test('a tap on the tracker changes the count by exactly one', () => {
   assert.equal(nextCountOnTap(0, 0), 1);
   assert.equal(nextCountOnTap(1, 0), 0);
 });
+
+test('full-day recording adds to individual entries without changing targets or earlier days', () => {
+  const { recordFullDays } = loadSource('src/lib/progress.ts');
+  const s = plan({ log: { '2026-09-09': { isha: 2 }, [today]: { fajr: 2 } } });
+  const next = recordFullDays(s, today, 4);
+  assert.deepEqual(next.log[today], { ...fillCounts(4), fajr: 6 });
+  assert.deepEqual(next.log['2026-09-09'], { isha: 2 });
+  assert.equal(next.targets, s.targets);
+  assert.deepEqual(s.log[today], { fajr: 2 });
+  const p = deriveProgress(next, today);
+  assert.deepEqual(p.remainingByPrayer, { ...fillCounts(96), fajr: 94, isha: 94 });
+  assert.equal(p.todayDone, 22);
+});
+
+test('full days respect the smallest balance and reject invalid quantities', () => {
+  const { recordFullDays } = loadSource('src/lib/progress.ts');
+  const s = plan({ counts: { ...fillCounts(10), fajr: 2 } });
+  for (const n of [0, -1, 1.5, NaN, Infinity, 3]) assert.equal(recordFullDays(s, today, n), s);
+  const next = recordFullDays(s, today, 2);
+  assert.equal(deriveProgress(next, today).remainingByPrayer.fajr, 0);
+  assert.equal(recordFullDays(next, today, 1), next);
+  assert.deepEqual(recordFullDays(defaultState(), today, 4).log[today], fillCounts(4));
+});
+
+test('bulk undo restores the prior log, preserves target edits, and rejects stale undo', () => {
+  const { recordFullDays, undoFullDays } = loadSource('src/lib/progress.ts');
+  const s = plan({ log: { [today]: { fajr: 2 } } });
+  const next = recordFullDays(s, today, 4);
+  const edited = { ...next, targets: fillCounts(2) };
+  const undone = undoFullDays(edited, next.log, s.log);
+  assert.equal(undone.log, s.log);
+  assert.equal(undone.targets, edited.targets);
+  const later = { ...next, log: { ...next.log, [today]: { ...next.log[today], fajr: 7 } } };
+  assert.equal(undoFullDays(later, next.log, s.log), later);
+  const empty = plan();
+  const recorded = recordFullDays(empty, today, 1);
+  assert.deepEqual(undoFullDays(recorded, recorded.log, empty.log).log, {});
+});
